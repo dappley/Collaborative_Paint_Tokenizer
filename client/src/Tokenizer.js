@@ -1,22 +1,13 @@
+import TokenGenerator from "./contracts/TokenGenerator.json";
+import { base64ImageData } from "./components/canvas/Canvas";
 import React, { useState, useEffect } from "react";
 import { NFTStorage, File } from 'nft.storage';
-import TokenGenerator from "./contracts/TokenGenerator.json";
-import getWeb3 from "./getWeb3";
-import { base64ImageData } from "./components/canvas/Canvas"
+import Connection from './helper/Connection';
+import getWeb3 from "./helper/getWeb3";
 import "./Tokenizer.css";
 import Web3 from "web3";
-import Connection from './Connection';
 
 const Tokenizer = () => {
-  //     web3: null,
-  //     results: null,
-  //     artwork: null,
-  //     accounts: null,
-  //     contract: null,
-  //     tokenSymbol: '',
-  //     tokenName: '',
-  //     recipient: '',
-  //     tokenDescription: '',
   const [web3, setWeb3] = useState(undefined);
   const [accounts, setAccounts] = useState(undefined);
   const [contract, setContract] = useState(undefined);
@@ -27,6 +18,8 @@ const Tokenizer = () => {
   const [artwork, setArtwork] = useState(dataURLtoFile(base64ImageData, 'paint.png'));
   const [result, setResult] = useState(undefined);
 
+  // Connects to MetaMask & gets account and contract info
+  // Only when this js file is rendered first
   useEffect(() => {
     const init = async() => {
       // Get network provider and web3 instance.
@@ -48,34 +41,79 @@ const Tokenizer = () => {
     init();
   },[])
 
+  // Connects to MetaMask & gets account and contract info
+  function connectMetaMask() {
+    const connect = async() => {
+      var web3;
+      if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        try {
+          // Request account access if needed
+          await window.ethereum.enable();
+          // Accounts now exposed
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      // Legacy dapp browsers...
+      else if (window.web3) {
+        // Use Mist/MetaMask's provider.
+        web3 = window.web3;
+        console.log("Injected web3 detected.");
+      }
+      // Fallback to localhost; use dev console port by default...
+      else {
+        const provider = new Web3.providers.HttpProvider(
+          "http://127.0.0.1:8545"
+        );
+        web3 = new Web3(provider);
+        console.log("No web3 instance injected, using Local web3.");
+      }
+      const accounts = await web3.eth.getAccounts();
+      const networkId = await web3.eth.net.getId();
+      const deployedNetwork = TokenGenerator.networks[networkId];
+      const instance = new web3.eth.Contract(
+        TokenGenerator.abi,
+        deployedNetwork && deployedNetwork.address,
+      );
+      setWeb3(web3);
+      setAccounts(accounts);
+      setContract(instance);
+    }
+    connect();
+  }
+
+  //Prints out the variable values
   function printAll() {
     console.log(recipient);
     console.log(symbol);
     console.log(name);
     console.log(description);
     console.log(artwork);
-    console.log(artwork.name);
-    console.log(artwork.type);
+    console.log(web3);
+    console.log(accounts);
+    console.log(contract);
+    console.log(result);
   }
 
+  //Converts the base64 image data to an image file
   function dataURLtoFile(dataurl, filename) {
     var arr = dataurl.split(','),
         mime = arr[0].match(/:(.*?);/)[1],
         bstr = atob(arr[1]), 
         n = bstr.length, 
         u8arr = new Uint8Array(n);
-        
+
     while(n--){
         u8arr[n] = bstr.charCodeAt(n);
     }
-    
     return new File([u8arr], filename, {type:mime});
 }
 
   // Create IPFS & Metadata then pin the data on the nft.storage
-  function onSubmit() {
-    const tokenize = async () => {
-      require('dotenv').config()
+  function tokenize() {
+    const createToken = async () => {
+      // require('dotenv').config()
       // const client = new NFTStorage({ token: process.env.REACT_APP_SECRET_APIKEY })
       const client = new NFTStorage({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDc5ODAzNDQ4ZTJhN0REQzlkZkEzMTVmNjRlY0UyMjVBMTk3NzJBQjQiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTYzMjUxNDY0MTQxNCwibmFtZSI6IkRpZ2l0YWxfQXJ0d29ya19NaW50ZXIifQ.iemBYngkmlnWA_GzU_qaDT9csnkndmYmKeYWlu0x-EI' })
       const metadata = await client.store({
@@ -83,7 +121,7 @@ const Tokenizer = () => {
         description: description,
         image: new File([artwork], artwork.name, { type: artwork.type })
       })
-      // create Token
+      // #TODO ERROR: Contract method doesn't have an address yet(?)
       const result = await contract.methods.createToken(recipient, description, symbol, metadata.url).send({ from: accounts[0] });
       const links = {
         artwork_link: `ipfs.io/ipfs/${metadata.data.image.pathname.slice(2)}`,
@@ -93,10 +131,12 @@ const Tokenizer = () => {
       }
       setResult(links);
     };
-    tokenize();
+    createToken();
   }
 
-  function getResut() {
+  // Returns the following values on the frontend:
+  // artwork & metadatas' IPFS links, Token address and Token ID
+  function getResult() {
     if (result != null) {
       return (
         <div>
@@ -110,12 +150,20 @@ const Tokenizer = () => {
           <input type='text' value={result.token_ID} />
         </div>
       )
+    } else {
+      return (
+        <div>
+          <label>No Transaction Record</label>
+        </div>
+      )
     }
   }
 
+
   return (
     <div className="Tokenizer">
-      <Connection />
+      {/* <Connection /> */}
+      <button onClick={connectMetaMask}>Connect MetaMask</button>
       <header>Digital Artwork Minter</header>
       <p>Convert your digital art work to a Non-fungible token!</p>
       <img src={base64ImageData} />
@@ -136,13 +184,8 @@ const Tokenizer = () => {
         <input type='text' onChange={(event) => {setDescription(event.target.value); }} />
       </div>
       <button onClick={printAll}>PrintAll</button>
-      <button onClick={onSubmit}>Tokenize</button>
-      {/* <form onSubmit={this.onSubmit} >
-        <input type='submit' value='Tokenize' />
-      </form> */}
-      {/* <form>
-        {returnResults()}
-      </form> */}
+      <button onClick={tokenize}>Tokenize</button>
+      <button onClick={getResult}>Token Info</button>
     </div>
   );
 }
