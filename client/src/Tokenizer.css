@@ -36,3 +36,9 @@
 .Tokenizer img {
   background-color: white;
 }
+
+#renderResult {
+  margin-top: 20px;
+  width: 600px;
+  place-items: center;
+}

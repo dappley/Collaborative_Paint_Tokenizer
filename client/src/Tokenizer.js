@@ -2,7 +2,7 @@ import TokenGenerator from "./contracts/TokenGenerator.json";
 import { base64ImageData } from "./components/canvas/Canvas";
 import React, { useState, useEffect } from "react";
 import { NFTStorage, File } from 'nft.storage';
-import Connection from './helper/Connection';
+// import Connection from './helper/Connection';
 import getWeb3 from "./helper/getWeb3";
 import "./Tokenizer.css";
 import Web3 from "web3";
@@ -108,7 +108,7 @@ const Tokenizer = () => {
         u8arr[n] = bstr.charCodeAt(n);
     }
     return new File([u8arr], filename, {type:mime});
-}
+  }
 
   // Create IPFS & Metadata then pin the data on the nft.storage
   function tokenize() {
@@ -136,10 +136,14 @@ const Tokenizer = () => {
 
   // Returns the following values on the frontend:
   // artwork & metadatas' IPFS links, Token address and Token ID
-  function getResult() {
+  function ReturnTokenInfo() {
     if (result != null) {
+      console.log(result.artwork_link);
+      console.log(result.metadata_link);
+      console.log(result.token_address);
+      console.log(result.token_ID);
       return (
-        <div>
+        <div id='renderResult'>
           <label>Artowkr Link:</label>
           <input type='text' value={result.artwork_link} />
           <label>Metadata Link:</label>
@@ -185,7 +189,7 @@ const Tokenizer = () => {
       </div>
       <button onClick={printAll}>PrintAll</button>
       <button onClick={tokenize}>Tokenize</button>
-      <button onClick={getResult}>Token Info</button>
+      <ReturnTokenInfo />
     </div>
   );
 }
