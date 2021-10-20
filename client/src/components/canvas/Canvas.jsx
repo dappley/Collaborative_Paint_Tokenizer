@@ -3,6 +3,9 @@ import React from 'react';
 import './Canvas.css';
 
 var base64ImageData = null;
+var artworkTitle = null;
+var roomID = null;
+
 class Canvas extends React.Component {
     socket = io.connect("http://localhost:5000");
     artworkTitle = null;
@@ -13,24 +16,28 @@ class Canvas extends React.Component {
     constructor(props) {
         super(props);
         this.state = { room: this.props.room };
-        this.roomId = this.state.room;
         this.artworkTitle = this.state.artworkTitle;
-        this.socket.on("canvas-data", function (strokes) {
-            var canvas = document.querySelector('#canvas');
-            var ctx = canvas.getContext('2d');
-            console.log(strokes);
-            console.log("I did it");
-            strokes.forEach( (data) => {
-                ctx.lineWidth = data.lineWidth;
-                ctx.lineJoin = data.lineJoin;
-                ctx.strokeStyle = data.color;
-                ctx.lineCap = data.lineCap;
-                ctx.beginPath();
-                ctx.moveTo(data.pmx, data.pmy);
-                ctx.lineTo(data.mx, data.my);
-                ctx.closePath();
-                ctx.stroke();
-            });
+        artworkTitle = this.state.artworkTitle;
+        this.roomId = this.state.room;
+        roomID = this.state.room;
+        this.socket.on("canvas-data", function (room_ID, strokes) {
+            if (room_ID == roomID) {
+                var canvas = document.querySelector('#canvas');
+                var ctx = canvas.getContext('2d');
+                strokes.forEach( (data) => {
+                    ctx.lineWidth = data.lineWidth;
+                    ctx.lineJoin = data.lineJoin;
+                    ctx.strokeStyle = data.color;
+                    ctx.lineCap = data.lineCap;
+                    ctx.beginPath();
+                    ctx.moveTo(data.pmx, data.pmy);
+                    ctx.lineTo(data.mx, data.my);
+                    ctx.closePath();
+                    ctx.stroke();
+                });
+            } else {
+                console.log("Room ID does not match!")
+            }
         })
     }
 
@@ -47,9 +54,9 @@ class Canvas extends React.Component {
     setup() {
         this.socket.on("connect", () => {
             console.log("connected socket id " + this.socket.id + " to server");
-            console.log(this.artworkTitle);
+            console.log(artworkTitle);
             //#TODO artworkTitle is null
-            this.socket.emit("createRoom", this.roomId, this.artworkTitle);
+            this.socket.emit("createRoom", this.roomId, artworkTitle);
         });
 
         this.socket.on('usercount', this.setuc);
@@ -107,7 +114,8 @@ class Canvas extends React.Component {
             }
             strokes.push(data);
             base64ImageData = canvas.toDataURL("image/png");
-            root.socket.emit("canvas-data", strokes);
+            console.log("Room ID:", root.roomId);
+            root.socket.emit("canvas-data", root.roomId, strokes);
         };
     }
 

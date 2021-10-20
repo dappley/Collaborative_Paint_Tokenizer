@@ -26,26 +26,23 @@ function room(artworkTitle, usercount, paint) {
 
 io.on('connection', (socket) => {
       console.log("Socket ID:" + socket.id);
-      let room_ID;
 
       socket.on("createRoom", async (roomId, artworkTitle) => {
             roomExist = findArtworkbyKey(roomId);
-            room_ID = roomId;
             try {
                   await socket.join(roomId);
                   console.log(socket.id + " joined in room id " + roomId);
-                  
+
                   if (!roomExist) {
                         rooms[roomId] = new room(artworkTitle, 1, []);
                   } else {
-                        await io.to(roomId).emit('canvas-data', rooms[roomId].paint);
+                        await io.to(roomId).emit('canvas-data', roomId, rooms[roomId].paint);
                         rooms[roomId].usercount++;
                   }
 
-
                   setInterval(() => {
                         io.to(roomId).emit('usercount', {
-                        uc: rooms[roomId].usercount
+                              uc: rooms[roomId].usercount
                         });
                   }, 2 * 1000);
             } catch (e) {
@@ -60,9 +57,9 @@ io.on('connection', (socket) => {
             console.log(socket.id, "disconnected");
       });
 
-      socket.on('canvas-data', (strokes) => {
-            rooms[room_ID].paint.push(strokes);
-            socket.broadcast.emit('canvas-data', strokes);
+      socket.on('canvas-data', (roomId, strokes) => {
+            rooms[roomId].paint.push(strokes);
+            socket.broadcast.emit('canvas-data', roomId, strokes);
       })
 })
 
