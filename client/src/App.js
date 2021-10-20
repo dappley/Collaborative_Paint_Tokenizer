@@ -1,37 +1,28 @@
-import './App.css';
-// import io from 'socket.io-client';
-import React, { useState } from 'react';
 import Container from './components/container/Container';
+import React, { useState } from 'react';
+import './App.css';
 
 const { uuid } = require('uuidv4');
 
 function App() {
-  const [username, setUsername] = useState("");
   const [room, setRoom] = useState("");
-  // const [roomId, setRoomId] = useState(null);
-  const [showPaint, setShowPaint] = useState(false);
-  const [uuidv4/*, setUuidv4*/]= useState(uuid);
-  const [joinOrStart, setJoinOrStart] = useState(false);
-  // let socket;
+  const [username, setUsername] = useState("");
+  const [artworkTitle, setArtworkTitle] = useState("");
 
-  function joinRoom() {
-    if (username !== "" && room !== "") {
-      //socket = io.connect("http://localhost:5000");
-      //socket.emit("join_room", room);
-      //socket.emit(room, "data from client")
-      // socket.on(tempRoom, (data) => {
-      //   console.log(`test data is: ${data}}`);
-      //   setInfo(data);
-      // });
-      //setRoomId(room);
+  const [uuidv4, setuuidv4]= useState(uuid);
+  const [showPaint, setShowPaint] = useState(false);
+  const [joinOrStart, setJoinOrStart] = useState(false);
+
+  function startRoom() {
+    if (username !== "" && artworkTitle != "") {
       setShowPaint(true);
-      setJoinOrStart(true);
     }
   };
 
-  function startRoom() {
-    if (username !== "") {
+  function joinRoom() {
+    if (username !== "" && room !== "") {
       setShowPaint(true);
+      setJoinOrStart(true);
     }
   };
 
@@ -40,12 +31,19 @@ function App() {
       {!showPaint ? (
         <div className="lobby">
           <header>Welcome to collaborative paint and tokenizer!</header>
-          <h4>{room}</h4>
+          {/* <h4>{room}</h4> */}
           <input
             type="text"
             placeholder="User Name"
             onChange={(event) => {
               setUsername(event.target.value);
+            }}
+          />
+          <input
+            type="text"
+            placeholder="Artwork Title"
+            onChange={(event) => {
+              setArtworkTitle(event.target.value);
             }}
           />
           <input
@@ -59,7 +57,7 @@ function App() {
           <button onClick={startRoom}>Create a Room</button>
         </div>
       ) : (
-        <Container room={(joinOrStart===true) ? room : uuidv4} username={username}/>
+        <Container room={(joinOrStart===true) ? room : uuidv4} username={username} artworkTitle={artworkTitle} />
       )}
     </div>
   );

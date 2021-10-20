@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import Tokenizer from '../../Tokenizer';
-import Board from '../canvas/Canvas';
+import Canvas from '../canvas/Canvas';
 import './Container.css';
 
-function Container({ room, username}) {
-    const [color, setColor] = useState("#FFFFFF");
-    const [size, setSize] = useState(10);
-    const [eraser, setEraser] = useState(false);
+function Container({ room, username, artworkTitle }) {
     const [tokenize, setTokenize] = useState(false);
+    const [color, setColor] = useState("#C83349");
+    const [eraser, setEraser] = useState(false);
+    const [size, setSize] = useState(5);
 
     function tokenizer() {
         setTokenize(true);
@@ -21,8 +21,9 @@ function Container({ room, username}) {
         <div className="Container">
             {!tokenize? (
                 <div className="PaintBoard">
-                    <header>Let's Paint!</header>
-                    <p>User name: {username} / Room ID: {room}</p>
+                    <header>Let's Paint {artworkTitle}!</header>
+                    <p>Room ID: {room}</p>
+                    <p>User name: {username}</p>
                     <p>Brush size: {size}</p>
                     <div className="painting_tools">
                         <input
@@ -44,20 +45,14 @@ function Container({ room, username}) {
                             {(eraser === false) ? <div> Brush </div> : <div> Eraser </div>}
                         </button>
                     </div>
-                    <div className="board-container">
-                        {(room === null) ?
-                            <h1>please enter your room id</h1> :
-                            <Board
-                                color={(eraser === false) ? color : "#FFFFFF"}
-                                size={size}
-                                room={room}
-                            />
-                        }
-                    </div>
+                    <Canvas
+                        color={(eraser === false) ? color : "#FFFFFF"}
+                        artworkTitle={artworkTitle}
+                        size={size}
+                        room={room}
+                    />
                     <div className="createImage">
-                        <button onClick={tokenizer}>
-                            Tokenize
-                        </button>
+                        <button onClick={tokenizer}>Tokenize</button>
                     </div>
                 </div>
             ) : (
