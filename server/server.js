@@ -6,6 +6,7 @@ const httpServer = createServer(app);
 const io = require('socket.io')(httpServer);
 
 var rooms = {};
+var user_room = {};
 
 function findArtworkbyKey(roomId) {
   let room = rooms[roomId]
@@ -26,9 +27,12 @@ function room(artworkTitle, usercount, paint) {
 
 io.on('connection', (socket) => {
       console.log("Socket ID:" + socket.id);
-
+      
       socket.on("createRoom", async (roomId, artworkTitle) => {
             roomExist = findArtworkbyKey(roomId);
+            if (user_room[socket.id] == null || user_room[socket.id] != roomId) {
+                  user_room[socket.id] = roomId;
+            }
             try {
                   await socket.join(roomId);
                   console.log(socket.id + " joined in room id " + roomId);
@@ -36,7 +40,8 @@ io.on('connection', (socket) => {
                   if (!roomExist) {
                         rooms[roomId] = new room(artworkTitle, 1, []);
                   } else {
-                        await io.to(roomId).emit('canvas-data', roomId, rooms[roomId].paint);
+                        // #TODO 'canvas-data' does not get called.
+                        // await io.to(roomId).emit('canvas-data', roomId, rooms[roomId].paint);
                         rooms[roomId].usercount++;
                   }
 
@@ -50,10 +55,18 @@ io.on('connection', (socket) => {
             }
       });
 
+      // #TODO When one person get disconnected, the entire room gets disconnected
       socket.on('disconnect', async () => {
-            await io.to(room_ID).emit('usercount', {
-                  uc: rooms[room_ID].usercount--
-            });
+            roomId = user_room[socket.id]
+            try {
+                  await io.to(roomId).emit('usercount', {
+                        uc: rooms[roomId].usercount--
+                  });
+            } catch (e) {
+                  console.error(e);
+            }
+            
+
             console.log(socket.id, "disconnected");
       });
 

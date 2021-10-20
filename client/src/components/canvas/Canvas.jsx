@@ -55,7 +55,7 @@ class Canvas extends React.Component {
         this.socket.on("connect", () => {
             console.log("connected socket id " + this.socket.id + " to server");
             console.log(artworkTitle);
-            //#TODO artworkTitle is null
+            // #TODO artworkTitle is null
             this.socket.emit("createRoom", this.roomId, artworkTitle);
         });
 
