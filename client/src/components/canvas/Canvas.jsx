@@ -2,12 +2,11 @@ import io from 'socket.io-client';
 import React from 'react';
 import './Canvas.css';
 
-var outsideRoomId = null;
 var base64ImageData = null;
 class Canvas extends React.Component {
     socket = io.connect("http://localhost:5000");
+    artworkTitle = null;
     onlineUserCount;
-    artworkTitle = "";
     roomId = null;
     ctx;
 
@@ -16,22 +15,22 @@ class Canvas extends React.Component {
         this.state = { room: this.props.room };
         this.roomId = this.state.room;
         this.artworkTitle = this.state.artworkTitle;
-        this.socket.on("canvas-data", function (room, strokes) {
+        this.socket.on("canvas-data", function (strokes) {
             var canvas = document.querySelector('#canvas');
             var ctx = canvas.getContext('2d');
+            console.log(strokes);
+            console.log("I did it");
             strokes.forEach( (data) => {
                 ctx.lineWidth = data.lineWidth;
                 ctx.lineJoin = data.lineJoin;
-                ctx.lineCap = data.lineCap;
                 ctx.strokeStyle = data.color;
+                ctx.lineCap = data.lineCap;
                 ctx.beginPath();
                 ctx.moveTo(data.pmx, data.pmy);
                 ctx.lineTo(data.mx, data.my);
                 ctx.closePath();
                 ctx.stroke();
             });
-            console.log(strokes);
-            console.log(this.onlineUserCount);
         })
     }
 
@@ -43,31 +42,23 @@ class Canvas extends React.Component {
     componentWillReceiveProps(newProps) {
         this.ctx.strokeStyle = newProps.color;
         this.ctx.lineWidth = newProps.size;
-        //this.roomId = newProps.room;
     }
 
     setup() {
-        let artwork = this.getParameterByName("artwork");
-        console.log("artwork=" + artwork);
-
         this.socket.on("connect", () => {
             console.log("connected socket id " + this.socket.id + " to server");
-            this.socket.emit("artwork", artwork, this.roomId, this.artworkTitle);
+            console.log(this.artworkTitle);
+            //#TODO artworkTitle is null
+            this.socket.emit("createRoom", this.roomId, this.artworkTitle);
         });
 
         this.socket.on('usercount', this.setuc);
-
-        this.socket.on('artworkTitle', (data) => {
-            this.artworkTitle = data.artworkTitle;
-            console.log("The artwork title is:", this.artworkTitle);
-        });
     }
 
     drawOnCanvas() {
         var canvas = document.querySelector('#canvas');
         this.ctx = canvas.getContext('2d');
         var ctx = this.ctx;
-        var tempRoom = this.roomId
         var sketch = document.querySelector('#sketch');
         var sketch_style = getComputedStyle(sketch);
         canvas.width = parseInt(sketch_style.getPropertyValue('width'));
@@ -75,13 +66,11 @@ class Canvas extends React.Component {
         var mouse = { x: 0, y: 0 };
         var last_mouse = { x: 0, y: 0 };
 
-        /* Drawing on Paint App */
         ctx.lineWidth = this.props.size;
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
         ctx.strokeStyle = this.props.color;
 
-        /* Mouse Capturing Work */
         canvas.addEventListener('mousemove', function (e) {
             last_mouse.x = mouse.x;
             last_mouse.y = mouse.y;
@@ -117,26 +106,13 @@ class Canvas extends React.Component {
                 color: ctx.strokeStyle
             }
             strokes.push(data);
-            console.log("send canvas is " + tempRoom);
             base64ImageData = canvas.toDataURL("image/png");
-            console.log(strokes);
-            root.socket.emit("canvas-data", tempRoom, strokes);
+            root.socket.emit("canvas-data", strokes);
         };
     }
 
-    getParameterByName(name, url = window.location.href) { 
-        name = name.replace(/[\[\]]/g, '\\$&');
-        var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-            results = regex.exec(url);
-        if (!results) return null;
-        if (!results[2]) return '';
-        return decodeURIComponent(results[2].replace(/\+/g, ' '));
-    }
-
     setuc(data) {
-        // console.log(data.uc);
         this.onlineUserCount = data.uc;
-        // console.log(this.onlineUserCount);
     }
 
     render() {

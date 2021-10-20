@@ -5,72 +5,64 @@ const app = express();
 const httpServer = createServer(app);
 const io = require('socket.io')(httpServer);
 
-const encodeworks = [
-  { key: "2fa1981b4a9a7a3e2f1294354810635b9030c74f", artwork: "bridge" },
-  { key: "b1ade531057f51c2992479335d03b774afdeb6fa", artwork: "garden" },
-  { key: "5a46b8253d07320a14cace9b4dcbf80f93dcef04", artwork: "flower" },
-  { key: "d79ac4a2b1ac0251b7bbbceb4649e4a964bc5597", artwork: "mountain" }
-    ];
-
 var rooms = {};
 
-function findArtworkbyKey(key) {
-  let work = encodeworks.find(art => art.key === key)
-  if(work) {
-      console.log(work.artwork);
-      return work.artwork;
+function findArtworkbyKey(roomId) {
+  let room = rooms[roomId]
+  if (room == null) {
+      console.log("This id doesn't exist yet!");
+      return false;
   } else {
-      console.log("public demo");
-      return "public demo"
+      console.log("Artwork Title:", room.artworkTitle);
+      return true;
   }
 }
 
-function room(usercount, paint) {
+function room(artworkTitle, usercount, paint) {
+  this.artworkTitle = artworkTitle;
   this.usercount = usercount;
   this.paint = paint;
 }
 
 io.on('connection', (socket) => {
-  console.log("Socket ID:" + socket.id);
-  let artwork = "";
+      console.log("Socket ID:" + socket.id);
+      let room_ID;
 
-  //register the socket id to a room that refers to an artwork
-  socket.on("artwork", async (arg) => {
-      artwork = findArtworkbyKey(arg);
-      try {
-        if (!rooms[artwork]) {
-            rooms[artwork] = new room(1, []);
-        } else {
-            rooms[artwork].usercount++;
-      }
-      await socket.join(artwork);
-      console.log(socket.id + " joined in room " + artwork);
-      
-      setInterval(() => {
-        io.to(artwork).emit('usercount', {
-            uc: rooms[artwork].usercount
-        });
-      }, 2 * 1000);
+      socket.on("createRoom", async (roomId, artworkTitle) => {
+            roomExist = findArtworkbyKey(roomId);
+            room_ID = roomId;
+            try {
+                  await socket.join(roomId);
+                  console.log(socket.id + " joined in room id " + roomId);
+                  
+                  if (!roomExist) {
+                        rooms[roomId] = new room(artworkTitle, 1, []);
+                  } else {
+                        await io.to(roomId).emit('canvas-data', rooms[roomId].paint);
+                        rooms[roomId].usercount++;
+                  }
 
-      io.to(artwork).emit('artworkTitle', {
-        artworkTitle: artwork
-      });
-      } catch (e) {
-        console.error(socket.id + " failed to join in " + artwork + e);
-      }
+
+                  setInterval(() => {
+                        io.to(roomId).emit('usercount', {
+                        uc: rooms[roomId].usercount
+                        });
+                  }, 2 * 1000);
+            } catch (e) {
+                  console.error(socket.id + " failed to join room " + roomId + e);
+            }
       });
 
       socket.on('disconnect', async () => {
-            await io.to(artwork).emit('usercount', {
-            uc: rooms[artwork].usercount--
+            await io.to(room_ID).emit('usercount', {
+                  uc: rooms[room_ID].usercount--
             });
-            console.log("User Disconnected", socket.id);
+            console.log(socket.id, "disconnected");
       });
 
-      socket.on('canvas-data', (room, strokes) => {
-            rooms[artwork].paint.push(strokes);
-            console.log(strokes);
-            socket.broadcast.emit('canvas-data', room, strokes);
+      socket.on('canvas-data', (strokes) => {
+            rooms[room_ID].paint.push(strokes);
+            socket.broadcast.emit('canvas-data', strokes);
       })
 })
 
