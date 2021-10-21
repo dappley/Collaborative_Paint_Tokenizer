@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Tokenizer from '../../Tokenizer';
-import Canvas from '../canvas/Canvas';
+import Canvas, {base64ImageData} from '../canvas/Canvas';
 import './Container.css';
 
 function Container({ room, username, artworkTitle }) {
@@ -10,7 +10,9 @@ function Container({ room, username, artworkTitle }) {
     const [size, setSize] = useState(5);
 
     function tokenizer() {
-        setTokenize(true);
+        if (base64ImageData != null) {
+            setTokenize(true);
+        }
     }
 
     const handleEraser = () => {
@@ -21,7 +23,7 @@ function Container({ room, username, artworkTitle }) {
         <div className="Container">
             {!tokenize? (
                 <div className="PaintBoard">
-                    <header>Let's Paint {artworkTitle}!</header>
+                    <header>Let's Paint!</header>
                     <p>Room ID: {room}</p>
                     <p>User name: {username}</p>
                     <p>Brush size: {size}</p>
@@ -45,12 +47,14 @@ function Container({ room, username, artworkTitle }) {
                             {(eraser === false) ? <div> Brush </div> : <div> Eraser </div>}
                         </button>
                     </div>
-                    <Canvas
-                        color={(eraser === false) ? color : "#FFFFFF"}
-                        artworkTitle={artworkTitle}
-                        size={size}
-                        room={room}
-                    />
+                    <div className="canvas">
+                        <Canvas
+                            color={(eraser === false) ? color : "#FFFFFF"}
+                            artworkTitle={artworkTitle}
+                            size={size}
+                            room={room}
+                        />
+                    </div>
                     <div className="createImage">
                         <button onClick={tokenizer}>Tokenize</button>
                     </div>

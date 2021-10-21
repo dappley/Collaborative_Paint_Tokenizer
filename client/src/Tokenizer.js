@@ -1,4 +1,5 @@
 import TokenGenerator from "./contracts/TokenGenerator.json";
+import Container from "./components/container/Container.jsx";
 import { base64ImageData } from "./components/canvas/Canvas";
 import React, { useState, useEffect } from "react";
 import { NFTStorage, File } from 'nft.storage';
@@ -17,6 +18,7 @@ const Tokenizer = () => {
   const [description, setDescription] = useState(undefined);
   const [artwork, setArtwork] = useState(dataURLtoFile(base64ImageData, 'paint.png'));
   const [result, setResult] = useState(undefined);
+  const [back, setBack] = useState(false);
 
   // Connects to MetaMask & gets account and contract info
   // Only when this js file is rendered first
@@ -81,19 +83,6 @@ const Tokenizer = () => {
       setContract(instance);
     }
     connect();
-  }
-
-  //Prints out the variable values
-  function printAll() {
-    console.log(recipient);
-    console.log(symbol);
-    console.log(name);
-    console.log(description);
-    console.log(artwork);
-    console.log(web3);
-    console.log(accounts);
-    console.log(contract);
-    console.log(result);
   }
 
   //Converts the base64 image data to an image file
@@ -163,33 +152,38 @@ const Tokenizer = () => {
     }
   }
 
-
   return (
     <div className="Tokenizer">
-      {/* <Connection /> */}
-      <button onClick={connectMetaMask}>Connect MetaMask</button>
-      <header>Digital Artwork Minter</header>
-      <p>Convert your digital art work to a Non-fungible token!</p>
-      <img src={base64ImageData} />
-      <div>
-        <label>Recipient :</label>
-        <input type='text' onChange={(event) => {setRecipient(event.target.value); }} />
-      </div>
-      <div>
-        <label>Token Symbol :</label>
-        <input type='text' onChange={(event) => {setSymbol(event.target.value); }} />
-      </div>
-      <div>
-        <label>Token Name :</label>
-        <input type='text' onChange={(event) => {setName(event.target.value); }} />
-      </div>
-      <div>
-        <label>Token Description :</label>
-        <input type='text' onChange={(event) => {setDescription(event.target.value); }} />
-      </div>
-      <button onClick={printAll}>PrintAll</button>
-      <button onClick={tokenize}>Tokenize</button>
-      <ReturnTokenInfo />
+      {!back? (
+        <div className="Contents">
+          <button onClick={() => {setBack(true); }}>Back</button>
+          <button onClick={connectMetaMask}>Connect MetaMask</button>
+          <header>Digital Artwork Minter</header>
+          <p>Convert your digital art work to a Non-fungible token!</p>
+          <img src={base64ImageData} />
+          <div>
+            <label>Recipient :</label>
+            <input type='text' onChange={(event) => {setRecipient(event.target.value); }} />
+          </div>
+          <div>
+            <label>Token Symbol :</label>
+            <input type='text' onChange={(event) => {setSymbol(event.target.value); }} />
+          </div>
+          <div>
+            <label>Token Name :</label>
+            <input type='text' onChange={(event) => {setName(event.target.value); }} />
+          </div>
+          <div>
+            <label>Token Description :</label>
+            <input type='text' onChange={(event) => {setDescription(event.target.value); }} />
+          </div>
+          <button onClick={tokenize}>Tokenize</button>
+          <ReturnTokenInfo />
+        </div>
+      ) : (
+        <Container />
+      )}
+
     </div>
   );
 }
