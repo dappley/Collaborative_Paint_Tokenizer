@@ -1,65 +1,39 @@
-import Container from './components/container/Container';
-import React, { useState } from 'react';
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import Container from './Pages/PaintBoard/container/Container';
+import Tokenizer from './Pages/Tokenizer/Tokenizer';
+import Lobby from './Pages/Lobby/Lobby';
+import React from 'react';
 import './App.css';
 
-const { uuid } = require('uuidv4');
-
 function App() {
-  const [room, setRoom] = useState("");
-  const [username, setUsername] = useState("");
-  const [artworkTitle, setArtworkTitle] = useState("");
-
-  const [uuidv4, setuuidv4]= useState(uuid);
-  const [showPaint, setShowPaint] = useState(false);
-  const [joinOrStart, setJoinOrStart] = useState(false);
-
-  function startRoom() {
-    if (username !== "" && artworkTitle != "") {
-      setShowPaint(true);
-    }
-  };
-
-  function joinRoom() {
-    if (username !== "" && room !== "") {
-      setShowPaint(true);
-      setJoinOrStart(true);
-    }
-  };
-
   return (
-    <div className="App">
-      {!showPaint ? (
-        <div className="lobby">
-          <header>Welcome to collaborative paint and tokenizer!</header>
-          {/* <h4>{room}</h4> */}
-          <input
-            type="text"
-            placeholder="User Name"
-            onChange={(event) => {
-              setUsername(event.target.value);
-            }}
-          />
-          <input
-            type="text"
-            placeholder="Artwork Title"
-            onChange={(event) => {
-              setArtworkTitle(event.target.value);
-            }}
-          />
-          <input
-            type="text"
-            placeholder="Room ID"
-            onChange={(event) => {
-              setRoom(event.target.value);
-            }}
-          />
-          <button onClick={joinRoom}>Join a Room</button>
-          <button onClick={startRoom}>Create a Room</button>
+    <Router>
+      <div className="main">
+        <div>
+          <button>
+            <Link to="/Lobby">Lobby</Link>
+          </button>
+          <button>
+            <Link to="/PaintBoard">Paint Board</Link>
+          </button>
+          <button>
+            <Link to="/Tokenizer">Tokenizer</Link>
+          </button>
         </div>
-      ) : (
-        <Container room={(joinOrStart===true) ? room : uuidv4} username={username} artworkTitle={artworkTitle} />
-      )}
-    </div>
+      </div>
+      
+      <Switch>
+        <Route path="/Lobby">
+          <Lobby />
+        </Route>
+        <Route path="/PaintBoard">
+          <Container />
+        </Route>
+        <Route path="/Tokenizer">
+          <Tokenizer />
+        </Route>
+      </Switch>
+    </Router>
   );
 }
 

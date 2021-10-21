@@ -1,10 +1,10 @@
-import TokenGenerator from "./contracts/TokenGenerator.json";
-import Container from "./components/container/Container.jsx";
-import { base64ImageData } from "./components/canvas/Canvas";
+import TokenGenerator from "../../contracts/TokenGenerator.json";
+import Container from "../PaintBoard/container/Container.jsx";
+import { base64ImageData } from "../PaintBoard/canvas/Canvas";
 import React, { useState, useEffect } from "react";
 import { NFTStorage, File } from 'nft.storage';
 // import Connection from './helper/Connection';
-import getWeb3 from "./helper/getWeb3";
+import getWeb3 from "../../helper/getWeb3";
 import "./Tokenizer.css";
 import Web3 from "web3";
 

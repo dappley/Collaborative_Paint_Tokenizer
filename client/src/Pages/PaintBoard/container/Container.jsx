@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Tokenizer from '../../Tokenizer';
+import Tokenizer from '../../Tokenizer/Tokenizer';
 import Canvas, {base64ImageData} from '../canvas/Canvas';
 import './Container.css';
 
