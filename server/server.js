@@ -61,6 +61,17 @@ io.on('connection', (socket) => {
             rooms[roomId].paint.push(data);
             socket.broadcast.emit('canvas-data', roomId, data);
       })
+
+      socket.on('checkRoomID_call', (roomId) => {
+            console.log("checking on room", roomId);
+            if (room[roomId] != null) {
+                  console.log("This room exists");
+                  socket.emit('checkRoomID_return', true);
+            } else {
+                  console.log("This room does not exists");
+                  socket.emit('checkRoomID_return', false);
+            }
+      })
 })
 
 var server_port = process.env.YOUR_PORT || process.env.PORT || 5000;

@@ -3,26 +3,55 @@ import PaintBoard from '../PaintBoard/container/Container';
 import React, { useState, useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
 import '../../App.css';
-import getLinkType from '../../helper/getLinkType';
+import getLinkInfo from '../../helper/getLinkInfo';
 import Tokenizer from '../Tokenizer/Tokenizer';
+import io from 'socket.io-client';
 
 function Lobby() {
   const [uuidv4] = useState(uuid);
   const [linkType, setLinkType] = useState("");
   const [room, setRoom] = useState("");
+  const [roomExist, setRoomExist] = useState(false);
   const [username, setUsername] = useState("");
   const [showPaint, setShowPaint] = useState(false);
   const [artworkTitle, setArtworkTitle] = useState("");
   const [join, setJoin] = useState(false);
+  const [paintBoardLink, setPaintBoardLink] = useState("/PaintBoard" + "/room=" + uuidv4);
 
-  var id = "/room=" + uuidv4;
-  var paintBoard_link = "/PaintBoard" + "/room=" + uuidv4;
+  const socket = io.connect("http://localhost:5000");
 
   useEffect((url = window.location.href) => {
-    let linkType = getLinkType(url);
-    setLinkType(linkType);
+    let linkInfo = getLinkInfo(url);
+    setLinkType(linkInfo[0]);
+    setRoom(linkInfo[1]);
+    console.log(linkInfo[0]);
+    console.log(linkInfo[1]);
     if (linkType === "PaintBoard" || linkType === "Tokenizer") {
-      setShowPaint(true);
+      // #TODO check if the room ID exists in socket.io
+      // if set paintBoardLink to the current link; otherwise return.
+      console.log("I am here");
+      socket.on("connect", () => {
+        console.log("Now I am here");
+        socket.emit("checkRoomID_call", room);
+        socket.on("checkRoomID_return", (isExist) => {
+        console.log("isExist:", isExist);
+        if (isExist) {
+          console.log("This room ID does exists!");
+          setRoomExist(true);
+        } else {
+          console.log("This room ID does not exist.");
+        }
+        });
+        console.log("I am also here");
+      });
+      if (roomExist) {
+        console.log("Connecting to the room...");
+        setPaintBoardLink("/PaintBoard/room=" + room);
+        setShowPaint(true);
+        setJoin(true);
+      } else {
+        console.log("Redirecting to lobby...");
+      }
     }
   });
 
@@ -67,16 +96,16 @@ function Lobby() {
               }}
             />
             <button onClick={joinRoom}>
-              <Link to={"/PaintBoard"}>Join a Room</Link>
+              <Link to={paintBoardLink}>Join a Room</Link>
             </button>
             <button onClick={startRoom}>
-              <Link to={"/PaintBoard"}>Create a Room</Link>
+              <Link to={paintBoardLink}>Create a Room</Link>
             </button>
           </div>
         </div>
       ) : (
         <Switch>
-          <Route path={"/PaintBoard"}>
+          <Route path={paintBoardLink}>
             <PaintBoard room={(join === true) ? room : uuidv4} username={username} artworkTitle={artworkTitle}/>
           </Route>
           <Route path="/Tokenizer">
