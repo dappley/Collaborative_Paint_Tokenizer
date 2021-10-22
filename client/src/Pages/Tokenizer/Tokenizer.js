@@ -1,5 +1,6 @@
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import TokenGenerator from "../../contracts/TokenGenerator.json";
-import Container from "../PaintBoard/container/Container.jsx";
+import PaintBoard from "../PaintBoard/container/Container.jsx";
 import { base64ImageData } from "../PaintBoard/canvas/Canvas";
 import React, { useState, useEffect } from "react";
 import { NFTStorage, File } from 'nft.storage';
@@ -7,8 +8,10 @@ import { NFTStorage, File } from 'nft.storage';
 import getWeb3 from "../../helper/getWeb3";
 import "./Tokenizer.css";
 import Web3 from "web3";
-
-const Tokenizer = () => {
+// {roomId, /*username, */artworkTitle}
+const Tokenizer = (props) => {
+  const roomId = props.room;
+  const artworkTitle = props.artworkTitle;
   const [web3, setWeb3] = useState(undefined);
   const [accounts, setAccounts] = useState(undefined);
   const [contract, setContract] = useState(undefined);
@@ -19,6 +22,9 @@ const Tokenizer = () => {
   const [artwork, setArtwork] = useState(dataURLtoFile(base64ImageData, 'paint.png'));
   const [result, setResult] = useState(undefined);
   const [back, setBack] = useState(false);
+  // const [roomId, setRoomId] = useState(roomId);
+  // const [artworkTitle, setArtworkTitle] = useState(artworkTitle);
+  const [paintBoardLink, setPaintBoardLink] = useState("/PaintBoard/room=" + roomId);
 
   // Connects to MetaMask & gets account and contract info
   // Only when this js file is rendered first
@@ -110,7 +116,6 @@ const Tokenizer = () => {
         description: description,
         image: new File([artwork], artwork.name, { type: artwork.type })
       })
-      // #TODO ERROR: Contract method doesn't have an address yet(?)
       const result = await contract.methods.createToken(recipient, description, symbol, metadata.url).send({ from: accounts[0] });
       const links = {
         artwork_link: `ipfs.io/ipfs/${metadata.data.image.pathname.slice(2)}`,
@@ -153,38 +158,45 @@ const Tokenizer = () => {
   }
 
   return (
-    <div className="Tokenizer">
-      {!back? (
-        <div className="Contents">
-          <button onClick={() => {setBack(true); }}>Back</button>
-          <button onClick={connectMetaMask}>Connect MetaMask</button>
-          <header>Digital Artwork Minter</header>
-          <p>Convert your digital art work to a Non-fungible token!</p>
-          <img src={base64ImageData} />
-          <div>
-            <label>Recipient :</label>
-            <input type='text' onChange={(event) => {setRecipient(event.target.value); }} />
+    <Router>
+      <div className="Tokenizer">
+        {!back? (
+          <div className="Contents">
+            <button onClick={() => {setBack(true); }}>
+              <Link to={paintBoardLink}>Back</Link>
+            </button>
+            <button onClick={connectMetaMask}>Connect MetaMask</button>
+            <header>Digital Artwork Minter</header>
+            <p>Convert your digital art work to a Non-fungible token!</p>
+            <img src={base64ImageData} />
+            <div>
+              <label>Recipient :</label>
+              <input type='text' onChange={(event) => {setRecipient(event.target.value); }} />
+            </div>
+            <div>
+              <label>Token Symbol :</label>
+              <input type='text' onChange={(event) => {setSymbol(event.target.value); }} />
+            </div>
+            <div>
+              <label>Token Name :</label>
+              <input type='text' onChange={(event) => {setName(event.target.value); }} />
+            </div>
+            <div>
+              <label>Token Description :</label>
+              <input type='text' onChange={(event) => {setDescription(event.target.value); }} />
+            </div>
+            <button onClick={tokenize}>Tokenize</button>
+            <ReturnTokenInfo />
           </div>
-          <div>
-            <label>Token Symbol :</label>
-            <input type='text' onChange={(event) => {setSymbol(event.target.value); }} />
-          </div>
-          <div>
-            <label>Token Name :</label>
-            <input type='text' onChange={(event) => {setName(event.target.value); }} />
-          </div>
-          <div>
-            <label>Token Description :</label>
-            <input type='text' onChange={(event) => {setDescription(event.target.value); }} />
-          </div>
-          <button onClick={tokenize}>Tokenize</button>
-          <ReturnTokenInfo />
-        </div>
-      ) : (
-        <Container />
-      )}
-
-    </div>
+        ) : (
+          <Switch>
+          <Route path={paintBoardLink}>
+            <PaintBoard room={roomId} /*username={username} */artworkTitle={artworkTitle}/>
+          </Route>
+        </Switch>
+        )}
+      </div>
+    </Router>
   );
 }
 

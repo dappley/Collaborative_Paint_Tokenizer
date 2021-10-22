@@ -12,59 +12,49 @@ const CONNECTION_PORT = 'http://localhost:5000';
 
 function Lobby() {
   const [uuidv4] = useState(uuid);
-  const [linkType, setLinkType] = useState("");
   const [room, setRoom] = useState("");
-  const [roomExist, setRoomExist] = useState(false);
-  const [username, setUsername] = useState("");
+  // const [username, setUsername] = useState("");
   const [showPaint, setShowPaint] = useState(false);
   const [artworkTitle, setArtworkTitle] = useState("");
   const [join, setJoin] = useState(false);
-  const [paintBoardLink, setPaintBoardLink] = useState("/PaintBoard" + "/room=" + uuidv4);
+  const [tokenizerLink, setTokenizerLink] = useState("/Tokenizer/room=" + uuidv4);
+  const [paintBoardLink, setPaintBoardLink] = useState("/PaintBoard/room=" + uuidv4);
 
 
   useEffect((url = window.location.href) => {
     socket = io.connect(CONNECTION_PORT);
     let linkInfo = getLinkInfo(url);
-    setLinkType(linkInfo[0]);
-    setRoom(linkInfo[1]);
-    console.log(linkInfo[0]);
-    console.log(linkInfo[1]);
     if (linkInfo[0] === "PaintBoard" || linkInfo[0] === "Tokenizer") {
-      console.log("I am here");
       socket.on("connect", () => {
-        console.log("Now I am here");
+        // #TODO socket.emit & socket.on aren't being called
         socket.emit("checkRoomID_Call", linkInfo[1]);
         socket.on("checkRoomID_Return", (isExist) => {
-        console.log("isExist:", isExist);
-        if (isExist) {
-          console.log("This room ID does exists!");
-          setRoomExist(true);
-        } else {
-          console.log("This room ID does not exist.");
-        }
+          if (isExist) {
+            console.log("This room ID does exists! :)");
+            console.log("Connecting to the room...");
+            setPaintBoardLink("/PaintBoard/room=" + linkInfo[1]);
+            setTokenizerLink("/Tokenizer/room=" + linkInfo[1]);
+            setRoom(linkInfo[1]);
+            setShowPaint(true);
+            setJoin(true);
+          } else {
+            console.log("This room ID does not exist. :(");
+            console.log("Redirecting to lobby...");
+            window.location.reaplce = "localhost:3000/Lobby";
+          }
         });
-        console.log("I am also here");
       });
-
-      if (roomExist) {
-        console.log("Connecting to the room...");
-        setPaintBoardLink("/PaintBoard/room=" + linkInfo[1]);
-        setShowPaint(true);
-        setJoin(true);
-      } else {
-        console.log("Redirecting to lobby...");
-      }
     }
   }, [CONNECTION_PORT]);
 
   function startRoom() {
-    if (username !== "" && artworkTitle != "") {
+    if (/*username !== "" && */artworkTitle != "") {
       setShowPaint(true);
     }
   };
 
   function joinRoom() {
-    if (username !== "" && room !== "") {
+    if (/*username !== "" && */room !== "") {
       setShowPaint(true);
       setJoin(true);
     }
@@ -76,13 +66,13 @@ function Lobby() {
         <div className="App">
           <div className="lobby">
             <header>Welcome to collaborative paint and tokenizer!</header>
-            <input
+            {/* <input
               type="text"
               placeholder="User Name"
               onChange={(event) => {
                 setUsername(event.target.value);
               }}
-            />
+            /> */}
             <input
               type="text"
               placeholder="Artwork Title"
@@ -108,13 +98,15 @@ function Lobby() {
       ) : (
         <Switch>
           <Route path={paintBoardLink}>
-            <PaintBoard room={(join === true) ? room : uuidv4} username={username} artworkTitle={artworkTitle}/>
+            {console.log(paintBoardLink)}
+            {console.log("room:", room)}
+            {console.log("join:", join)}
+            <PaintBoard room={(join === true) ? room : uuidv4} /*username={username}*/ artworkTitle={artworkTitle}/>
           </Route>
-          <Route path="/Tokenizer">
+          <Route path={tokenizerLink}>
             <Tokenizer />
           </Route>
         </Switch>
-        
       )}
     </Router>
   );

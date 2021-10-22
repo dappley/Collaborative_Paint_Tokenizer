@@ -27,6 +27,15 @@ function room(artworkTitle, paint) {
 
 io.on('connection', (socket) => {
       console.log("Socket ID:" + socket.id);
+
+      socket.on("checkRoomID_Call", async (roomId) => {
+            console.log("checking on room", roomId);
+            if (rooms[roomId] != null) {
+                  socket.emit("checkRoomID_Return", true);
+            } else {
+                  socket.emit("checkRoomID_Return", false);
+            }
+      })
       
       socket.on("createRoom", async (roomId, artworkTitle) => {
             roomExist = findArtworkbyKey(roomId);
@@ -39,6 +48,7 @@ io.on('connection', (socket) => {
 
                   if (!roomExist) {
                         console.log("Creating a new room with the artwork:", artworkTitle);
+                        console.log("Room ID:", roomId);
                         rooms[roomId] = new room(artworkTitle, []);
                   } else {
                         console.log("Joining the room with the artwork:", artworkTitle);
@@ -61,15 +71,6 @@ io.on('connection', (socket) => {
       socket.on('canvas-data', (roomId, data) => {
             rooms[roomId].paint.push(data);
             socket.broadcast.emit('canvas-data', roomId, data);
-      })
-
-      socket.on("checkRoomID_Call", async (roomId) => {
-            console.log("checking on room", roomId);
-            if (room[roomId] != null) {
-                  socket.emit("checkRoomID_Return", true);
-            } else {
-                  socket.emit("checkRoomID_Return", false);
-            }
       })
 })
 
