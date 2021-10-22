@@ -7,6 +7,9 @@ import getLinkInfo from '../../helper/getLinkInfo';
 import Tokenizer from '../Tokenizer/Tokenizer';
 import io from 'socket.io-client';
 
+let socket;
+const CONNECTION_PORT = 'http://localhost:5000';
+
 function Lobby() {
   const [uuidv4] = useState(uuid);
   const [linkType, setLinkType] = useState("");
@@ -18,22 +21,20 @@ function Lobby() {
   const [join, setJoin] = useState(false);
   const [paintBoardLink, setPaintBoardLink] = useState("/PaintBoard" + "/room=" + uuidv4);
 
-  const socket = io.connect("http://localhost:5000");
 
   useEffect((url = window.location.href) => {
+    socket = io.connect(CONNECTION_PORT);
     let linkInfo = getLinkInfo(url);
     setLinkType(linkInfo[0]);
     setRoom(linkInfo[1]);
     console.log(linkInfo[0]);
     console.log(linkInfo[1]);
-    if (linkType === "PaintBoard" || linkType === "Tokenizer") {
-      // #TODO check if the room ID exists in socket.io
-      // if set paintBoardLink to the current link; otherwise return.
+    if (linkInfo[0] === "PaintBoard" || linkInfo[0] === "Tokenizer") {
       console.log("I am here");
       socket.on("connect", () => {
         console.log("Now I am here");
-        socket.emit("checkRoomID_call", room);
-        socket.on("checkRoomID_return", (isExist) => {
+        socket.emit("checkRoomID_Call", linkInfo[1]);
+        socket.on("checkRoomID_Return", (isExist) => {
         console.log("isExist:", isExist);
         if (isExist) {
           console.log("This room ID does exists!");
@@ -44,16 +45,17 @@ function Lobby() {
         });
         console.log("I am also here");
       });
+
       if (roomExist) {
         console.log("Connecting to the room...");
-        setPaintBoardLink("/PaintBoard/room=" + room);
+        setPaintBoardLink("/PaintBoard/room=" + linkInfo[1]);
         setShowPaint(true);
         setJoin(true);
       } else {
         console.log("Redirecting to lobby...");
       }
     }
-  });
+  }, [CONNECTION_PORT]);
 
   function startRoom() {
     if (username !== "" && artworkTitle != "") {

@@ -7,6 +7,7 @@ const io = require('socket.io')(httpServer);
 
 var rooms = {};
 var user_room = {};
+var server_port = 5000; // || process.env.YOUR_PORT || process.env.PORT;
 
 function findArtworkbyKey(roomId) {
   let room = rooms[roomId]
@@ -62,19 +63,16 @@ io.on('connection', (socket) => {
             socket.broadcast.emit('canvas-data', roomId, data);
       })
 
-      socket.on('checkRoomID_call', (roomId) => {
+      socket.on("checkRoomID_Call", async (roomId) => {
             console.log("checking on room", roomId);
             if (room[roomId] != null) {
-                  console.log("This room exists");
-                  socket.emit('checkRoomID_return', true);
+                  socket.emit("checkRoomID_Return", true);
             } else {
-                  console.log("This room does not exists");
-                  socket.emit('checkRoomID_return', false);
+                  socket.emit("checkRoomID_Return", false);
             }
       })
 })
 
-var server_port = process.env.YOUR_PORT || process.env.PORT || 5000;
 httpServer.listen(server_port, () => {
       console.log("Started on : " + server_port);
 })
