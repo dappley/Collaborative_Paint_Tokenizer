@@ -26,7 +26,6 @@ function Lobby() {
     let linkInfo = getLinkInfo(url);
     if (linkInfo[0] === "PaintBoard" || linkInfo[0] === "Tokenizer") {
       socket.on("connect", () => {
-        // #TODO socket.emit & socket.on aren't being called
         socket.emit("checkRoomID_Call", linkInfo[1]);
         socket.on("checkRoomID_Return", (isExist) => {
           if (isExist) {
@@ -40,7 +39,7 @@ function Lobby() {
           } else {
             console.log("This room ID does not exist. :(");
             console.log("Redirecting to lobby...");
-            window.location.reaplce = "localhost:3000/Lobby";
+            // window.location.reaplce = "localhost:3000/Lobby";
           }
         });
       });

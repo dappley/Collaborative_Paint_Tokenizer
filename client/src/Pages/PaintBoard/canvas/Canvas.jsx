@@ -1,5 +1,5 @@
 import io from 'socket.io-client';
-import React, { useEffect } from 'react';
+import React from 'react';
 import './Canvas.css';
 
 var base64ImageData = null;
