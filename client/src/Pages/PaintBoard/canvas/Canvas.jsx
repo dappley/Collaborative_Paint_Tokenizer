@@ -19,10 +19,7 @@ class Canvas extends React.Component {
         artworkTitle = this.state.artworkTitle;
         this.roomId = this.state.room;
         roomID = this.state.room;
-        console.log("Room ID from container to canvas:", roomID);
         this.socket.on("canvas-data", function (room_ID, data) {
-            console.log("server", room_ID);
-            console.log("passed down", roomID);
             if (room_ID === roomID) {
                 var canvas = document.querySelector('#canvas');
                 var ctx = canvas.getContext('2d');
@@ -53,7 +50,6 @@ class Canvas extends React.Component {
 
     setup() {
         let url = this.getRoomIdFromLink();
-        console.log("this.roomId:", this.roomId);
         this.socket.on("connect", () => {
             console.log("Connected socket id " + this.socket.id + " to artwork: " + artworkTitle);
             this.socket.emit("createRoom", this.roomId, artworkTitle);

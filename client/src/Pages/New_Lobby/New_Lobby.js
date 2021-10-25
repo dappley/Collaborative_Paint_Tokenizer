@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import PaintBoard from '../PaintBoard/container/Container';
 import getLinkInfo from '../../helper/getLinkInfo';
-import Tokenizer from '../Tokenizer/Tokenizer';
 import io from 'socket.io-client';
 import React from 'react';
 import uuid from 'uuid';
@@ -18,7 +17,6 @@ class New_Lobby extends React.Component {
             artworkTitle: "",
             showPaint: false,
             uuidv4: uuid.v4(),
-            tokenizerLink: "",
             paintBoardLink: "",
         };
         this.setArtworkTitle = this.setArtworkTitle.bind(this);
@@ -30,9 +28,8 @@ class New_Lobby extends React.Component {
     componentWillMount(url = window.location.href) {
         socket = io.connect(CONNECTION_PORT);
         this.setState({paintBoardLink: "/PaintBoard/room=" + this.state.uuidv4});
-        this.setState({tokenizerLink: "/Tokenizer/room=" + this.state.uuidv4});
         let linkInfo = getLinkInfo(url);
-        if (linkInfo[0] === "PaintBoard" || linkInfo[0] === "Tokenizer") {
+        if (linkInfo[0] === "PaintBoard") {
             socket.on("connect", () => {
                 socket.emit("checkRoomID_Call", linkInfo[1]);
                 socket.on("checkRoomID_Return", (isExist) => {
@@ -40,7 +37,6 @@ class New_Lobby extends React.Component {
                         console.log("This room ID does exists!");
                         console.log("Connecting to the room...");
                         this.setState({paintBoardLink: "/PaintBoard/room=" + linkInfo[1]});
-                        this.setState({tokenizerLink: "/Tokenizer/room=" + linkInfo[1]});
                         this.setState({room: linkInfo[1]});
                         this.setState({showPaint: true});
                     } else {
@@ -48,10 +44,17 @@ class New_Lobby extends React.Component {
                         console.log("Redirecting to the lobby...");
                         if (typeof window !== 'undefined') {
                             window.location.href = "http://localhost:3000/Lobby";
-                       }
+                        }
                     }
                 });
             });
+        } else if (linkInfo[0] === "Lobby") {
+            console.log("Welcome to collaborative painting & tokenizer!");
+        } else {
+            console.log("Error: Invalid Link, Redirecting to the lobby...");
+            if (typeof window !== 'undefined') {
+                window.location.href = "http://localhost:3000/Lobby";
+            }
         }
     }
 
@@ -112,9 +115,6 @@ class New_Lobby extends React.Component {
                     <Switch>
                         <Route path={this.state.paintBoardLink}>
                             <PaintBoard room={this.state.room} artworkTitle={this.state.artworkTitle} />
-                        </Route>
-                        <Route path={this.state.tokenizerLink}>
-                            <Tokenizer />
                         </Route>
                     </Switch>
                 )}

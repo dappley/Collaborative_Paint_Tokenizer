@@ -50,7 +50,6 @@ function Container({ room, artworkTitle }) {
                             </button>
                         </div>
                         <div className="canvas">
-                            {console.log("Canvas room ID:", room)}
                             <Canvas
                                 color={(eraser === false) ? color : "#FFFFFF"}
                                 artworkTitle={artworkTitle}
@@ -67,8 +66,6 @@ function Container({ room, artworkTitle }) {
                 ) : (
                 <Switch>
                     <Route path={tokenizerLink}>
-                        {console.log(room)}
-                        {console.log(artworkTitle)}
                       <Tokenizer room={room} artworkTitle={artworkTitle} />
                     </Route>
                 </Switch>
