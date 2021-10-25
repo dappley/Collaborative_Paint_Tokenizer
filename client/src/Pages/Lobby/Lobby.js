@@ -1,114 +1,130 @@
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import PaintBoard from '../PaintBoard/container/Container';
-import React, { useState, useEffect } from 'react';
-import { v4 as uuid } from 'uuid';
-import '../../App.css';
 import getLinkInfo from '../../helper/getLinkInfo';
-import Tokenizer from '../Tokenizer/Tokenizer';
 import io from 'socket.io-client';
+import React from 'react';
+import uuid from 'uuid';
+import '../../App.css';
 
 let socket;
 const CONNECTION_PORT = 'http://localhost:5000';
 
-function Lobby() {
-  const [uuidv4] = useState(uuid);
-  const [room, setRoom] = useState("");
-  // const [username, setUsername] = useState("");
-  const [showPaint, setShowPaint] = useState(false);
-  const [artworkTitle, setArtworkTitle] = useState("");
-  const [join, setJoin] = useState(false);
-  const [tokenizerLink, setTokenizerLink] = useState("/Tokenizer/room=" + uuidv4);
-  const [paintBoardLink, setPaintBoardLink] = useState("/PaintBoard/room=" + uuidv4);
-
-
-  useEffect((url = window.location.href) => {
-    socket = io.connect(CONNECTION_PORT);
-    let linkInfo = getLinkInfo(url);
-    if (linkInfo[0] === "PaintBoard" || linkInfo[0] === "Tokenizer") {
-      socket.on("connect", () => {
-        socket.emit("checkRoomID_Call", linkInfo[1]);
-        socket.on("checkRoomID_Return", (isExist) => {
-          if (isExist) {
-            console.log("This room ID does exists! :)");
-            console.log("Connecting to the room...");
-            setPaintBoardLink("/PaintBoard/room=" + linkInfo[1]);
-            setTokenizerLink("/Tokenizer/room=" + linkInfo[1]);
-            setRoom(linkInfo[1]);
-            setShowPaint(true);
-            setJoin(true);
-          } else {
-            console.log("This room ID does not exist. :(");
-            console.log("Redirecting to lobby...");
-            // window.location.reaplce = "localhost:3000/Lobby";
-          }
-        });
-      });
+class New_Lobby extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            room: "",
+            artworkTitle: "",
+            showPaint: false,
+            uuidv4: uuid.v4(),
+            paintBoardLink: "",
+        };
+        this.setArtworkTitle = this.setArtworkTitle.bind(this);
+        this.startRoom = this.startRoom.bind(this);
+        this.joinRoom = this.joinRoom.bind(this);
+        this.setRoom = this.setRoom.bind(this);
     }
-  }, [CONNECTION_PORT]);
 
-  function startRoom() {
-    if (/*username !== "" && */artworkTitle != "") {
-      setShowPaint(true);
+    componentWillMount(url = window.location.href) {
+        socket = io.connect(CONNECTION_PORT);
+        this.setState({paintBoardLink: "/PaintBoard/room=" + this.state.uuidv4});
+        let linkInfo = getLinkInfo(url);
+        if (linkInfo[0] === "PaintBoard") {
+            socket.on("connect", () => {
+                socket.emit("checkRoomID_Call", linkInfo[1]);
+                socket.on("checkRoomID_Return", (isExist, artworkTitle) => {
+                    if (isExist) {
+                        console.log("This room ID does exists!");
+                        console.log("Connecting to the room...");
+                        this.setState({paintBoardLink: "/PaintBoard/room=" + linkInfo[1]});
+                        this.setState({room: linkInfo[1]});
+                        this.setState({artworkTitle: artworkTitle});
+                        this.setState({showPaint: true});
+                    } else {
+                        console.log("This room ID does not exist.");
+                        console.log("Redirecting to the lobby...");
+                        if (typeof window !== 'undefined') {
+                            window.location.href = "http://localhost:3000/Lobby";
+                        }
+                    }
+                });
+            });
+        } else if (linkInfo[0] === "Lobby") {
+            console.log("Welcome to collaborative painting & tokenizer!");
+        } else {
+            console.log("Error: Invalid Link, Redirecting to the lobby...");
+            if (typeof window !== 'undefined') {
+                window.location.href = "http://localhost:3000/Lobby";
+            }
+        }
     }
-  };
 
-  function joinRoom() {
-    if (/*username !== "" && */room !== "") {
-      setShowPaint(true);
-      setJoin(true);
+    startRoom() {
+        if (this.state.artworkTitle !== "") {
+            this.setState({showPaint: true});
+            this.setState({room: this.state.uuidv4});
+        }
+    };
+
+    joinRoom() {
+        if (this.state.room !== "") {
+            this.setState({showPaint: true});
+        }
+    };
+
+    setRoom(room) {
+        if (this.state.artworkTitle === "") {
+            this.setState({room: room});
+            this.setState({paintBoardLink: "/PaintBoard/room=" + room});
+        }
     }
-  };
 
-  return (
-    <Router>
-      {!showPaint ? (
-        <div className="App">
-          <div className="lobby">
-            <header>Welcome to collaborative paint and tokenizer!</header>
-            {/* <input
-              type="text"
-              placeholder="User Name"
-              onChange={(event) => {
-                setUsername(event.target.value);
-              }}
-            /> */}
-            <input
-              type="text"
-              placeholder="Artwork Title"
-              onChange={(event) => {
-                setArtworkTitle(event.target.value);
-              }}
-            />
-            <input
-              type="text"
-              placeholder="Room ID"
-              onChange={(event) => {
-                setRoom(event.target.value);
-              }}
-            />
-            <button onClick={joinRoom}>
-              <Link to={paintBoardLink}>Join a Room</Link>
-            </button>
-            <button onClick={startRoom}>
-              <Link to={paintBoardLink}>Create a Room</Link>
-            </button>
-          </div>
-        </div>
-      ) : (
-        <Switch>
-          <Route path={paintBoardLink}>
-            {console.log(paintBoardLink)}
-            {console.log("room:", room)}
-            {console.log("join:", join)}
-            <PaintBoard room={(join === true) ? room : uuidv4} /*username={username}*/ artworkTitle={artworkTitle}/>
-          </Route>
-          <Route path={tokenizerLink}>
-            <Tokenizer />
-          </Route>
-        </Switch>
-      )}
-    </Router>
-  );
+    setArtworkTitle(artworkTitle) {
+        this.setState({artworkTitle: artworkTitle});
+    }
+
+    render() {
+        return (
+            <div>
+                <header>This is going to be here the whole time!</header>
+                <Router>
+                    {!this.state.showPaint ? (
+                        <div className="App">
+                            <div className="lobby">
+                                <header>Welcome to collaborative paint and tokenizer!</header>
+                                <input
+                                    type="text"
+                                    placeholder="Artwork Title"
+                                    onChange={(event) => {
+                                    this.setArtworkTitle(event.target.value);
+                                    }}
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Room ID"
+                                    onChange={(event) => {
+                                    this.setRoom(event.target.value);
+                                    }}
+                                />
+                                <button onClick={this.joinRoom}>
+                                    <Link to={this.state.paintBoardLink}>Join a Room</Link>
+                                </button>
+                                <button onClick={this.startRoom}>
+                                    <Link to={this.state.paintBoardLink}>Create a Room</Link>
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <Switch>
+                            <Route path={this.state.paintBoardLink}>
+                                <PaintBoard room={this.state.room} artworkTitle={this.state.artworkTitle} />
+                            </Route>
+                        </Switch>
+                    )}
+                </Router>
+            </div>
+        )
+    }
 }
 
-export default Lobby;
+export default New_Lobby;
