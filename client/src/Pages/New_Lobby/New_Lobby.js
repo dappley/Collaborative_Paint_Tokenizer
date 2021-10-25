@@ -16,10 +16,7 @@ class New_Lobby extends React.Component {
         this.state = {
             room: "",
             artworkTitle: "",
-
-            join: false,
             showPaint: false,
-
             uuidv4: uuid.v4(),
             tokenizerLink: "",
             paintBoardLink: "",
@@ -46,7 +43,6 @@ class New_Lobby extends React.Component {
                         this.setState({tokenizerLink: "/Tokenizer/room=" + linkInfo[1]});
                         this.setState({room: linkInfo[1]});
                         this.setState({showPaint: true});
-                        this.setState({join: true});
                     } else {
                         console.log("This room ID does not exist.");
                         console.log("Redirecting to the lobby...");
@@ -62,13 +58,13 @@ class New_Lobby extends React.Component {
     startRoom() {
         if (this.state.artworkTitle != "") {
             this.setState({showPaint: true});
+            this.setState({room: this.state.uuidv4});
         }
     };
 
     joinRoom() {
         if (this.state.room !== "") {
             this.setState({showPaint: true});
-            this.setState({join: true});
         }
     };
 
@@ -115,7 +111,7 @@ class New_Lobby extends React.Component {
                 ) : (
                     <Switch>
                         <Route path={this.state.paintBoardLink}>
-                            <PaintBoard room={(this.state.join === true) ? this.state.room : this.state.uuidv4} artworkTitle={this.state.artworkTitle} />
+                            <PaintBoard room={this.state.room} artworkTitle={this.state.artworkTitle} />
                         </Route>
                         <Route path={this.state.tokenizerLink}>
                             <Tokenizer />
