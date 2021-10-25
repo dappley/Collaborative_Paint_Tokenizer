@@ -1,17 +1,16 @@
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import PaintBoard from '../PaintBoard/container/Container';
-import React from 'react';
-import uuid from 'uuid';
-import '../../App.css';
 import getLinkInfo from '../../helper/getLinkInfo';
 import Tokenizer from '../Tokenizer/Tokenizer';
 import io from 'socket.io-client';
+import React from 'react';
+import uuid from 'uuid';
+import '../../App.css';
 
 let socket;
 const CONNECTION_PORT = 'http://localhost:5000';
 
 class New_Lobby extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -36,14 +35,12 @@ class New_Lobby extends React.Component {
         this.setState({paintBoardLink: "/PaintBoard/room=" + this.state.uuidv4});
         this.setState({tokenizerLink: "/Tokenizer/room=" + this.state.uuidv4});
         let linkInfo = getLinkInfo(url);
-        console.log(this.state.uuidv4);
         if (linkInfo[0] === "PaintBoard" || linkInfo[0] === "Tokenizer") {
             socket.on("connect", () => {
                 socket.emit("checkRoomID_Call", linkInfo[1]);
                 socket.on("checkRoomID_Return", (isExist) => {
-                    console.log("isExist:", isExist);
                     if (isExist) {
-                        console.log("This room ID does exists! :)");
+                        console.log("This room ID does exists!");
                         console.log("Connecting to the room...");
                         this.setState({paintBoardLink: "/PaintBoard/room=" + linkInfo[1]});
                         this.setState({tokenizerLink: "/Tokenizer/room=" + linkInfo[1]});
@@ -51,30 +48,35 @@ class New_Lobby extends React.Component {
                         this.setState({showPaint: true});
                         this.setState({join: true});
                     } else {
-                        console.log("This room ID does not exist. :(");
-                        console.log("Redirecting to lobby...");
+                        console.log("This room ID does not exist.");
+                        console.log("Redirecting to the lobby...");
+                        if (typeof window !== 'undefined') {
+                            window.location.href = "http://localhost:3000/Lobby";
+                       }
                     }
                 });
             });
         }
-        setInterval(() => console.log("Loading...."), 100000,);
     }
 
     startRoom() {
-        if (/*username !== "" && */this.state.artworkTitle != "") {
+        if (this.state.artworkTitle != "") {
             this.setState({showPaint: true});
         }
     };
 
     joinRoom() {
-        if (/*username !== "" && */this.state.room !== "") {
+        if (this.state.room !== "") {
             this.setState({showPaint: true});
             this.setState({join: true});
         }
     };
 
     setRoom(room) {
-        this.setState({room: room});
+        if (this.state.artworkTitle == "") {
+            this.setState({room: room});
+            this.setState({paintBoardLink: "/PaintBoard/room=" + room});
+        }
     }
 
     setArtworkTitle(artworkTitle) {
@@ -88,13 +90,6 @@ class New_Lobby extends React.Component {
                     <div className="App">
                         <div className="lobby">
                             <header>Welcome to collaborative paint and tokenizer!</header>
-                            {/* <input
-                                type="text"
-                                placeholder="User Name"
-                                onChange={(event) => {
-                                setUsername(event.target.value);
-                                }}
-                            /> */}
                             <input
                                 type="text"
                                 placeholder="Artwork Title"
@@ -120,11 +115,7 @@ class New_Lobby extends React.Component {
                 ) : (
                     <Switch>
                         <Route path={this.state.paintBoardLink}>
-                            {console.log("Join", this.state.join)}
-                            {console.log(this.state.room)}
-                            {console.log(this.state.uuidv4)}
-                            {console.log(this.state.artworkTitle)}
-                            <PaintBoard room={(this.state.join === true) ? this.state.room : this.state.uuidv4} /*username={username}*/ artworkTitle={this.state.artworkTitle} />
+                            <PaintBoard room={(this.state.join === true) ? this.state.room : this.state.uuidv4} artworkTitle={this.state.artworkTitle} />
                         </Route>
                         <Route path={this.state.tokenizerLink}>
                             <Tokenizer />

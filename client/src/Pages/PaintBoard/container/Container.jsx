@@ -4,7 +4,7 @@ import Tokenizer from '../../Tokenizer/Tokenizer';
 import Canvas, {base64ImageData} from '../canvas/Canvas';
 import './Container.css';
 
-function Container({ room, /*username, */artworkTitle }) {
+function Container({ room, artworkTitle }) {
     const [tokenizerLink, setTokenizerLink] = useState("/Tokenizer/room=" + room);
     const [tokenize, setTokenize] = useState(false);
     const [color, setColor] = useState("#C83349");
@@ -28,7 +28,6 @@ function Container({ room, /*username, */artworkTitle }) {
                     <div className="PaintBoard">
                         <header>Let's Paint!</header>
                         <p>Room ID: {room}</p>
-                        {/* <p>User name: {username}</p> */}
                         <p>Brush size: {size}</p>
                         <div className="painting_tools">
                             <input
