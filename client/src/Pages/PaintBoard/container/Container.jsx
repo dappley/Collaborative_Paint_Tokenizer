@@ -1,8 +1,10 @@
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import React, { useState } from 'react';
 import Tokenizer from '../../Tokenizer/Tokenizer';
-import Canvas, {base64ImageData} from '../canvas/Canvas';
+import Canvas, { base64ImageData } from '../canvas/Canvas';
 import './Container.css';
+
+var container_toggle;
 
 function Container({ room, artworkTitle }) {
     const [tokenizerLink, setTokenizerLink] = useState("/Tokenizer/room=" + room);
@@ -14,6 +16,7 @@ function Container({ room, artworkTitle }) {
     function tokenizer() {
         if (base64ImageData != null) {
             setTokenize(true);
+            container_toggle = !container_toggle;
         }
     }
 
@@ -26,7 +29,7 @@ function Container({ room, artworkTitle }) {
             <div className="Container">
                 {!tokenize? (
                     <div className="PaintBoard">
-                        <header>Let's Paint!</header>
+                        <header>Let's Paint {artworkTitle}!</header>
                         <p>Room ID: {room}</p>
                         <p>Brush size: {size}</p>
                         <div className="painting_tools">
@@ -75,5 +78,6 @@ function Container({ room, artworkTitle }) {
     )
 }
 
+export {container_toggle};
 export default Container;
 

@@ -9,6 +9,9 @@ import getWeb3 from "../../helper/getWeb3";
 import "./Tokenizer.css";
 import Web3 from "web3";
 // {roomId, /*username, */artworkTitle}
+
+var tokenizer_toggle;
+
 const Tokenizer = (props) => {
   const roomId = props.room;
   const artworkTitle = props.artworkTitle;
@@ -162,7 +165,10 @@ const Tokenizer = (props) => {
       <div className="Tokenizer">
         {!back? (
           <div className="Contents">
-            <button onClick={() => {setBack(true); }}>
+            <button onClick={() => {
+              setBack(true);
+              tokenizer_toggle = !tokenizer_toggle;
+              }}>
               <Link to={paintBoardLink}>Back</Link>
             </button>
             <button onClick={connectMetaMask}>Connect MetaMask</button>
@@ -200,4 +206,5 @@ const Tokenizer = (props) => {
   );
 }
 
+export {tokenizer_toggle};
 export default Tokenizer;

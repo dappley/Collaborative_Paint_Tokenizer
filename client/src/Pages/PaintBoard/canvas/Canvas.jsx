@@ -1,3 +1,5 @@
+import { container_toggle } from '../container/Container';
+import { tokenizer_toggle } from '../../Tokenizer/Tokenizer';
 import io from 'socket.io-client';
 import React from 'react';
 import './Canvas.css';
@@ -19,8 +21,20 @@ class Canvas extends React.Component {
         artworkTitle = this.state.artworkTitle;
         this.roomId = this.state.room;
         roomID = this.state.room;
+        this.socket.on("synchronize", function (room_ID, imageData) {
+            if ((container_toggle == tokenizer_toggle) && room_ID === roomID) {
+                    var image = new Image();
+                    var canvas = document.querySelector('#canvas');
+                    var ctx = canvas.getContext('2d');
+                    image.onload = function () {
+                        ctx.drawImage(image, 0, 0);
+                    };
+                    image.src = imageData;
+                    base64ImageData = imageData;
+            }
+        })
         this.socket.on("canvas-data", function (room_ID, data) {
-            if (room_ID === roomID) {
+            if ((container_toggle == tokenizer_toggle) && room_ID === roomID) {
                 var canvas = document.querySelector('#canvas');
                 var ctx = canvas.getContext('2d');
                 ctx.lineWidth = data.lineWidth;
@@ -32,8 +46,6 @@ class Canvas extends React.Component {
                 ctx.lineTo(data.mx, data.my);
                 ctx.closePath();
                 ctx.stroke();
-            } else {
-                console.log("Room ID does not match!")
             }
         })
     }
@@ -49,7 +61,6 @@ class Canvas extends React.Component {
     }
 
     setup() {
-        let url = this.getRoomIdFromLink();
         this.socket.on("connect", () => {
             console.log("Connected socket id " + this.socket.id + " to artwork: " + artworkTitle);
             this.socket.emit("createRoom", this.roomId, artworkTitle);
@@ -105,12 +116,8 @@ class Canvas extends React.Component {
                 color: ctx.strokeStyle
             }
             base64ImageData = canvas.toDataURL("image/png");
-            root.socket.emit("canvas-data", root.roomId, data);
+            root.socket.emit("canvas-data", root.roomId, data, base64ImageData);
         };
-    }
-
-    getRoomIdFromLink(url = window.location.href) {
-        return url;
     }
 
     render() {

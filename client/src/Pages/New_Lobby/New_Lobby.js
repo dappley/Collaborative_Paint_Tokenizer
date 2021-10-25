@@ -32,12 +32,13 @@ class New_Lobby extends React.Component {
         if (linkInfo[0] === "PaintBoard") {
             socket.on("connect", () => {
                 socket.emit("checkRoomID_Call", linkInfo[1]);
-                socket.on("checkRoomID_Return", (isExist) => {
+                socket.on("checkRoomID_Return", (isExist, artworkTitle) => {
                     if (isExist) {
                         console.log("This room ID does exists!");
                         console.log("Connecting to the room...");
                         this.setState({paintBoardLink: "/PaintBoard/room=" + linkInfo[1]});
                         this.setState({room: linkInfo[1]});
+                        this.setState({artworkTitle: artworkTitle});
                         this.setState({showPaint: true});
                     } else {
                         console.log("This room ID does not exist.");
@@ -59,7 +60,7 @@ class New_Lobby extends React.Component {
     }
 
     startRoom() {
-        if (this.state.artworkTitle != "") {
+        if (this.state.artworkTitle !== "") {
             this.setState({showPaint: true});
             this.setState({room: this.state.uuidv4});
         }
@@ -72,7 +73,7 @@ class New_Lobby extends React.Component {
     };
 
     setRoom(room) {
-        if (this.state.artworkTitle == "") {
+        if (this.state.artworkTitle === "") {
             this.setState({room: room});
             this.setState({paintBoardLink: "/PaintBoard/room=" + room});
         }

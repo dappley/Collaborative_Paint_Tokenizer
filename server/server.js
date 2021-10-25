@@ -20,9 +20,10 @@ function findArtworkbyKey(roomId) {
   }
 }
 
-function room(artworkTitle, paint) {
+function room(artworkTitle, paint, imageData) {
   this.artworkTitle = artworkTitle;
   this.paint = paint;
+  this.imageData = imageData;
 }
 
 io.on('connection', (socket) => {
@@ -31,9 +32,9 @@ io.on('connection', (socket) => {
       socket.on("checkRoomID_Call", async (roomId) => {
             console.log("checking on room", roomId);
             if (rooms[roomId] != null) {
-                  socket.emit("checkRoomID_Return", true);
+                  socket.emit("checkRoomID_Return", true, rooms[roomId].artworkTitle);
             } else {
-                  socket.emit("checkRoomID_Return", false);
+                  socket.emit("checkRoomID_Return", false, null);
             }
       })
       
@@ -49,13 +50,15 @@ io.on('connection', (socket) => {
                   if (!roomExist) {
                         console.log("Creating a new room with the artwork:", artworkTitle);
                         console.log("Room ID:", roomId);
-                        rooms[roomId] = new room(artworkTitle, []);
+                        rooms[roomId] = new room(artworkTitle, [], null);
                   } else {
                         console.log("Joining the room with the artwork:", artworkTitle);
                         let painting = rooms[roomId].paint;
-                        painting.forEach(async (data) => {
-                              await socket.broadcast.emit('canvas-data', roomId, data);
-                        })
+                        let imageData = rooms[roomId].imageData;
+                        socket.emit('synchronize', roomId, imageData);
+                        // painting.forEach(async (data) => {
+                        //       await socket.broadcast.emit('canvas-data', roomId, data);
+                        // })
                   }
             } catch (e) {
                   console.error(socket.id + " failed to join room " + roomId + e);
@@ -68,8 +71,9 @@ io.on('connection', (socket) => {
             console.log(socket.id, "disconnected from room", roomId);
       });
 
-      socket.on('canvas-data', (roomId, data) => {
+      socket.on('canvas-data', (roomId, data, imageData) => {
             rooms[roomId].paint.push(data);
+            rooms[roomId].imageData = imageData;
             socket.broadcast.emit('canvas-data', roomId, data);
       })
 })
