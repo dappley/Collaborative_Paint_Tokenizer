@@ -1,0 +1,44 @@
+.Tokenizer {
+  width: 650px;
+  /* margin: 15%; */
+  text-align: center;
+  /* border-radius: 20px;
+  border: 3px solid #f9d5e5; */
+  font-family: 'Gloria Hallelujah', cursive;
+}
+
+.Tokenizer header {
+  margin: 10px;
+  font-size: 35px;
+  color: #f9d5e5;
+}
+
+.Tokenizer input[type='text'] {
+  margin: 5px;
+  outline: none;
+  font-size: 15px;
+  border-radius: 20px;
+  border: 3px solid #f9d5e5;
+  font-family: 'Gloria Hallelujah', cursive;
+}
+
+.Tokenizer input[type='submit'] {
+  margin: 5px;
+  outline: none;
+  font-size: 15px;
+  border-radius: 20px;
+  color: #f9d5e5;
+  border: 3px solid #f9d5e5;
+  background-color: #c83349;
+  font-family: 'Gloria Hallelujah', cursive;
+}
+
+.Tokenizer img {
+  background-color: white;
+}
+
+#renderResult {
+  margin-top: 20px;
+  width: 600px;
+  place-items: center;
+}
