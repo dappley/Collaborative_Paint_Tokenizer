@@ -4,7 +4,7 @@ import getLinkInfo from '../../helper/getLinkInfo';
 import io from 'socket.io-client';
 import React from 'react';
 import uuid from 'uuid';
-import '../../App.css';
+import './Lobby.css';
 
 import Web3 from "web3";
 import getWeb3 from "../../helper/getWeb3";
@@ -37,7 +37,7 @@ class New_Lobby extends React.Component {
         socket = io.connect(CONNECTION_PORT);
         this.setState({paintBoardLink: "/PaintBoard/room=" + this.state.uuidv4});
         let linkInfo = getLinkInfo(url);
-        if (linkInfo[0] === "PaintBoard") {
+        if (linkInfo[0] === "PaintBoard" || linkInfo[0] === "Tokenizer") {
             socket.on("connect", () => {
                 socket.emit("checkRoomID_Call", linkInfo[1]);
                 socket.on("checkRoomID_Return", (isExist, artworkTitle) => {
@@ -48,6 +48,12 @@ class New_Lobby extends React.Component {
                         this.setState({room: linkInfo[1]});
                         this.setState({artworkTitle: artworkTitle});
                         this.setState({showPaint: true});
+                        if (linkInfo[0] === "Tokenizer") {
+                            console.log("Redirecting to the painting board...");
+                            if (typeof window !== 'undefined') {
+                                window.location.href = "http://localhost:3000" + this.state.paintBoardLink;
+                            }
+                        }
                     } else {
                         console.log("This room ID does not exist.");
                         console.log("Redirecting to the lobby...");
@@ -79,8 +85,6 @@ class New_Lobby extends React.Component {
             );
             export_accounts = accounts;
             export_contract = instance;
-            console.log(export_accounts);
-            console.log(export_contract);
         } catch (error) {
             alert(
                 `Failed to load web3, accounts, or contract. Check console for details.`,
@@ -119,8 +123,6 @@ class New_Lobby extends React.Component {
         );
         export_accounts = accounts;
         export_contract = instance;
-        console.log(export_accounts);
-        console.log(export_contract);
       }
 
     startRoom() {
@@ -150,7 +152,9 @@ class New_Lobby extends React.Component {
     render() {
         return (
             <div>
-                <button onClick={this.connectMetaMask}>Connect MetaMask</button>
+                <div id='connectMetaMask'>
+                    <button onClick={this.connectMetaMask}>Connect MetaMask</button>
+                </div>
                 <Router>
                     {!this.state.showPaint ? (
                         <div className="App">

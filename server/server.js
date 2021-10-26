@@ -53,9 +53,9 @@ io.on('connection', (socket) => {
                         rooms[roomId] = new room(artworkTitle, [], null);
                   } else {
                         console.log("Joining the room with the artwork:", artworkTitle);
-                        let painting = rooms[roomId].paint;
                         let imageData = rooms[roomId].imageData;
                         socket.emit('synchronize', roomId, imageData);
+                        // let painting = rooms[roomId].paint;
                         // painting.forEach(async (data) => {
                         //       await socket.broadcast.emit('canvas-data', roomId, data);
                         // })

@@ -15,10 +15,10 @@ const Tokenizer = (props) => {
   const [symbol, setSymbol] = useState(undefined);
   const [name, setName] = useState(undefined);
   const [description, setDescription] = useState(undefined);
-  const [artwork, setArtwork] = useState(dataURLtoFile(base64ImageData, 'paint.png'));
+  const [artwork] = useState(dataURLtoFile(base64ImageData, 'paint.png'));
   const [result, setResult] = useState(undefined);
   const [back, setBack] = useState(false);
-  const [paintBoardLink, setPaintBoardLink] = useState("/PaintBoard/room=" + roomId);
+  const [paintBoardLink] = useState("/PaintBoard/room=" + roomId);
 
   //Converts the base64 image data to an image file
   function dataURLtoFile(dataurl, filename) {
@@ -36,9 +36,8 @@ const Tokenizer = (props) => {
   // Create IPFS & Metadata then pin the data on the nft.storage
   function tokenize() {
     const createToken = async () => {
-      // require('dotenv').config()
-      // const client = new NFTStorage({ token: process.env.REACT_APP_SECRET_APIKEY })
-      const client = new NFTStorage({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDc5ODAzNDQ4ZTJhN0REQzlkZkEzMTVmNjRlY0UyMjVBMTk3NzJBQjQiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTYzNTIwNDQ5MzM5MywibmFtZSI6IkNvbGxhYm9yYXRpdmUgUGFpbnRpbmcgVG9rZW5pemVyIn0.RkXEEtnT_R1E_ddDv0FDPGeGU3kZaSoR-xI3ca72MaA' })
+      require('dotenv').config()
+      const client = new NFTStorage({ token: process.env.REACT_APP_SECRET_APIKEY })
       const metadata = await client.store({
         name: name,
         description: description,

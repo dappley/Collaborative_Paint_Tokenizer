@@ -22,7 +22,7 @@ class Canvas extends React.Component {
         this.roomId = this.state.room;
         roomID = this.state.room;
         this.socket.on("synchronize", function (room_ID, imageData) {
-            if ((container_toggle == tokenizer_toggle) && room_ID === roomID) {
+            if ((container_toggle === tokenizer_toggle) && room_ID === roomID) {
                     var image = new Image();
                     var canvas = document.querySelector('#canvas');
                     var ctx = canvas.getContext('2d');
@@ -34,7 +34,7 @@ class Canvas extends React.Component {
             }
         })
         this.socket.on("canvas-data", function (room_ID, data) {
-            if ((container_toggle == tokenizer_toggle) && room_ID === roomID) {
+            if ((container_toggle === tokenizer_toggle) && room_ID === roomID) {
                 var canvas = document.querySelector('#canvas');
                 var ctx = canvas.getContext('2d');
                 ctx.lineWidth = data.lineWidth;

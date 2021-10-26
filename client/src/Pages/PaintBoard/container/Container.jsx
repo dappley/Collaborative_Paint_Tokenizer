@@ -7,7 +7,7 @@ import './Container.css';
 var container_toggle;
 
 function Container({ room, artworkTitle }) {
-    const [tokenizerLink, setTokenizerLink] = useState("/Tokenizer/room=" + room);
+    const [tokenizerLink] = useState("/Tokenizer/room=" + room);
     const [tokenize, setTokenize] = useState(false);
     const [color, setColor] = useState("#C83349");
     const [eraser, setEraser] = useState(false);

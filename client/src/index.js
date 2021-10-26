@@ -1,7 +1,7 @@
 import './index.css';
-import Lobby from './Pages/Lobby/Lobby';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Lobby from './Pages/Lobby/Lobby';
 import * as serviceWorker from './helper/serviceWorker';
 
 ReactDOM.render(

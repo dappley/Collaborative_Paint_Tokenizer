@@ -1,3 +1,22 @@
+#connectMetaMask {
+  float: right;
+  width: 100%;
+}
+
+#connectMetaMask button {
+  float: right;
+  margin: 5px;
+  width: 180px;
+  height: 40px;
+  outline: none;
+  font-size: 15px;
+  color: #ffffff;
+  border-radius: 10px;
+  background-color: RoyalBlue;
+  border: 3px solid #ffffff;
+  font-family: 'Gloria Hallelujah', cursive;
+}
+
 body {
   background: #e06377;
 }
