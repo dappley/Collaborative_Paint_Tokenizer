@@ -1,23 +1,16 @@
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-import TokenGenerator from "../../contracts/TokenGenerator.json";
 import PaintBoard from "../PaintBoard/container/Container.jsx";
 import { base64ImageData } from "../PaintBoard/canvas/Canvas";
-import React, { useState, useEffect } from "react";
+import { export_accounts, export_contract } from "../Lobby/Lobby";
 import { NFTStorage, File } from 'nft.storage';
-// import Connection from './helper/Connection';
-import getWeb3 from "../../helper/getWeb3";
+import React, { useState } from "react";
 import "./Tokenizer.css";
-import Web3 from "web3";
-// {roomId, /*username, */artworkTitle}
 
 var tokenizer_toggle;
 
 const Tokenizer = (props) => {
   const roomId = props.room;
   const artworkTitle = props.artworkTitle;
-  const [web3, setWeb3] = useState(undefined);
-  const [accounts, setAccounts] = useState(undefined);
-  const [contract, setContract] = useState(undefined);
   const [recipient, setRecipient] = useState(undefined);
   const [symbol, setSymbol] = useState(undefined);
   const [name, setName] = useState(undefined);
@@ -25,74 +18,7 @@ const Tokenizer = (props) => {
   const [artwork, setArtwork] = useState(dataURLtoFile(base64ImageData, 'paint.png'));
   const [result, setResult] = useState(undefined);
   const [back, setBack] = useState(false);
-  // const [roomId, setRoomId] = useState(roomId);
-  // const [artworkTitle, setArtworkTitle] = useState(artworkTitle);
   const [paintBoardLink, setPaintBoardLink] = useState("/PaintBoard/room=" + roomId);
-
-  // Connects to MetaMask & gets account and contract info
-  // Only when this js file is rendered first
-  useEffect(() => {
-    const init = async() => {
-      // Get network provider and web3 instance.
-      const web3 = await getWeb3();
-      // Use web3 to get the user's accounts.
-      const accounts = await web3.eth.getAccounts();
-      // Get the contract instance.
-      const networkId = await web3.eth.net.getId();
-      const deployedNetwork = TokenGenerator.networks[networkId];
-      const instance = new web3.eth.Contract(
-        TokenGenerator.abi,
-        deployedNetwork && deployedNetwork.address,
-      );
-      // Set web3, accounts, and contract to the state
-      setWeb3(web3);
-      setAccounts(accounts);
-      setContract(instance);
-    }
-    init();
-  },[])
-
-  // Connects to MetaMask & gets account and contract info
-  function connectMetaMask() {
-    const connect = async() => {
-      var web3;
-      if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        try {
-          // Request account access if needed
-          await window.ethereum.enable();
-          // Accounts now exposed
-        } catch (error) {
-          console.log(error);
-        }
-      }
-      // Legacy dapp browsers...
-      else if (window.web3) {
-        // Use Mist/MetaMask's provider.
-        web3 = window.web3;
-        console.log("Injected web3 detected.");
-      }
-      // Fallback to localhost; use dev console port by default...
-      else {
-        const provider = new Web3.providers.HttpProvider(
-          "http://127.0.0.1:8545"
-        );
-        web3 = new Web3(provider);
-        console.log("No web3 instance injected, using Local web3.");
-      }
-      const accounts = await web3.eth.getAccounts();
-      const networkId = await web3.eth.net.getId();
-      const deployedNetwork = TokenGenerator.networks[networkId];
-      const instance = new web3.eth.Contract(
-        TokenGenerator.abi,
-        deployedNetwork && deployedNetwork.address,
-      );
-      setWeb3(web3);
-      setAccounts(accounts);
-      setContract(instance);
-    }
-    connect();
-  }
 
   //Converts the base64 image data to an image file
   function dataURLtoFile(dataurl, filename) {
@@ -101,7 +27,6 @@ const Tokenizer = (props) => {
         bstr = atob(arr[1]), 
         n = bstr.length, 
         u8arr = new Uint8Array(n);
-
     while(n--){
         u8arr[n] = bstr.charCodeAt(n);
     }
@@ -113,13 +38,13 @@ const Tokenizer = (props) => {
     const createToken = async () => {
       // require('dotenv').config()
       // const client = new NFTStorage({ token: process.env.REACT_APP_SECRET_APIKEY })
-      const client = new NFTStorage({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDc5ODAzNDQ4ZTJhN0REQzlkZkEzMTVmNjRlY0UyMjVBMTk3NzJBQjQiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTYzMjUxNDY0MTQxNCwibmFtZSI6IkRpZ2l0YWxfQXJ0d29ya19NaW50ZXIifQ.iemBYngkmlnWA_GzU_qaDT9csnkndmYmKeYWlu0x-EI' })
+      const client = new NFTStorage({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDc5ODAzNDQ4ZTJhN0REQzlkZkEzMTVmNjRlY0UyMjVBMTk3NzJBQjQiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTYzNTIwNDQ5MzM5MywibmFtZSI6IkNvbGxhYm9yYXRpdmUgUGFpbnRpbmcgVG9rZW5pemVyIn0.RkXEEtnT_R1E_ddDv0FDPGeGU3kZaSoR-xI3ca72MaA' })
       const metadata = await client.store({
         name: name,
         description: description,
         image: new File([artwork], artwork.name, { type: artwork.type })
       })
-      const result = await contract.methods.createToken(recipient, description, symbol, metadata.url).send({ from: accounts[0] });
+      const result = await export_contract.methods.createToken(recipient, description, symbol, metadata.url).send({ from: export_accounts[0] });
       const links = {
         artwork_link: `ipfs.io/ipfs/${metadata.data.image.pathname.slice(2)}`,
         metadata_link: `ipfs.io/ipfs/${metadata.ipnft}/metadata.json`,
@@ -135,10 +60,6 @@ const Tokenizer = (props) => {
   // artwork & metadatas' IPFS links, Token address and Token ID
   function ReturnTokenInfo() {
     if (result != null) {
-      console.log(result.artwork_link);
-      console.log(result.metadata_link);
-      console.log(result.token_address);
-      console.log(result.token_ID);
       return (
         <div id='renderResult'>
           <label>Artowkr Link:</label>
@@ -171,7 +92,6 @@ const Tokenizer = (props) => {
               }}>
               <Link to={paintBoardLink}>Back</Link>
             </button>
-            <button onClick={connectMetaMask}>Connect MetaMask</button>
             <header>Digital Artwork Minter</header>
             <p>Convert your digital art work to a Non-fungible token!</p>
             <img src={base64ImageData} />
@@ -197,7 +117,7 @@ const Tokenizer = (props) => {
         ) : (
           <Switch>
           <Route path={paintBoardLink}>
-            <PaintBoard room={roomId} /*username={username} */artworkTitle={artworkTitle}/>
+            <PaintBoard room={roomId} artworkTitle={artworkTitle}/>
           </Route>
         </Switch>
         )}

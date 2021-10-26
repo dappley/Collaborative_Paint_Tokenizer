@@ -6,8 +6,15 @@ import React from 'react';
 import uuid from 'uuid';
 import '../../App.css';
 
+import Web3 from "web3";
+import getWeb3 from "../../helper/getWeb3";
+import TokenGenerator from "../../contracts/TokenGenerator.json";
+
 let socket;
 const CONNECTION_PORT = 'http://localhost:5000';
+
+let export_accounts;
+let export_contract;
 
 class New_Lobby extends React.Component {
     constructor(props) {
@@ -24,6 +31,7 @@ class New_Lobby extends React.Component {
         this.joinRoom = this.joinRoom.bind(this);
         this.setRoom = this.setRoom.bind(this);
     }
+
 
     componentWillMount(url = window.location.href) {
         socket = io.connect(CONNECTION_PORT);
@@ -59,6 +67,62 @@ class New_Lobby extends React.Component {
         }
     }
 
+    componentDidMount = async () => {
+        try {
+            const web3 = await getWeb3();
+            const accounts = await web3.eth.getAccounts();
+            const networkId = await web3.eth.net.getId();
+            const deployedNetwork = TokenGenerator.networks[networkId];
+            const instance = new web3.eth.Contract(
+                TokenGenerator.abi,
+                deployedNetwork && deployedNetwork.address,
+            );
+            export_accounts = accounts;
+            export_contract = instance;
+            console.log(export_accounts);
+            console.log(export_contract);
+        } catch (error) {
+            alert(
+                `Failed to load web3, accounts, or contract. Check console for details.`,
+                );
+            console.error(error);
+        }
+    };
+
+    connectMetaMask = async() => {
+        var web3;
+        if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        try {
+            await window.ethereum.enable();
+        } catch (error) {
+            console.log(error);
+        }
+        }
+        else if (window.web3) {
+        web3 = window.web3;
+        console.log("Injected web3 detected.");
+        }
+        else {
+        const provider = new Web3.providers.HttpProvider(
+            "http://127.0.0.1:8545"
+        );
+        web3 = new Web3(provider);
+        console.log("No web3 instance injected, using Local web3.");
+        }
+        const accounts = await web3.eth.getAccounts();
+        const networkId = await web3.eth.net.getId();
+        const deployedNetwork = TokenGenerator.networks[networkId];
+        const instance = new web3.eth.Contract(
+        TokenGenerator.abi,
+        deployedNetwork && deployedNetwork.address,
+        );
+        export_accounts = accounts;
+        export_contract = instance;
+        console.log(export_accounts);
+        console.log(export_contract);
+      }
+
     startRoom() {
         if (this.state.artworkTitle !== "") {
             this.setState({showPaint: true});
@@ -86,7 +150,7 @@ class New_Lobby extends React.Component {
     render() {
         return (
             <div>
-                <header>This is going to be here the whole time!</header>
+                <button onClick={this.connectMetaMask}>Connect MetaMask</button>
                 <Router>
                     {!this.state.showPaint ? (
                         <div className="App">
@@ -127,4 +191,5 @@ class New_Lobby extends React.Component {
     }
 }
 
+export {export_accounts, export_contract};
 export default New_Lobby;
