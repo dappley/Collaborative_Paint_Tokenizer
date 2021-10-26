@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import PaintBoard from "../PaintBoard/container/Container.jsx";
 import { base64ImageData } from "../PaintBoard/canvas/Canvas";
