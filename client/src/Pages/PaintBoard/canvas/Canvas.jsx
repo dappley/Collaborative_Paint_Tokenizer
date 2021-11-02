@@ -63,6 +63,10 @@ class Canvas extends React.Component {
     setup() {
         this.socket.on("connect", () => {
             console.log("Connected socket id " + this.socket.id + " to artwork: " + artworkTitle);
+            var canvas = document.querySelector('#canvas');
+            this.ctx = canvas.getContext('2d');
+            this.ctx.fillStyle = '#FFFFFF';
+            this.ctx.fillRect(0,0, canvas.width, canvas.height);
             this.socket.emit("createRoom", this.roomId, artworkTitle);
         });
     }
