@@ -62,7 +62,7 @@ function Container({ room, artworkTitle }) {
                         </div>
                         <div className="createImage">
                             <button onClick={tokenizer}>
-                                <Link to={tokenizerLink}>Tokenize</Link>
+                                <Link to={tokenizerLink} style={{ color: 'inherit', textDecoration: 'inherit'}}>Tokenize</Link>
                             </button>
                         </div>
                     </div>

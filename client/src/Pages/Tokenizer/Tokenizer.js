@@ -90,7 +90,7 @@ const Tokenizer = (props) => {
               setBack(true);
               tokenizer_toggle = !tokenizer_toggle;
               }}>
-              <Link to={paintBoardLink}>Back</Link>
+              <Link to={paintBoardLink} style={{ color: 'inherit', textDecoration: 'inherit'}}>Back</Link>
             </button>
             <header>Digital Artwork Minter</header>
             <p>Convert your digital art work to a Non-fungible token!</p>

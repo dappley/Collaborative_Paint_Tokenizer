@@ -175,10 +175,10 @@ class New_Lobby extends React.Component {
                                     }}
                                 />
                                 <button onClick={this.joinRoom}>
-                                    <Link to={this.state.paintBoardLink}>Join a Room</Link>
+                                    <Link to={this.state.paintBoardLink} style={{ color: 'inherit', textDecoration: 'inherit'}}>Join a Room</Link>
                                 </button>
                                 <button onClick={this.startRoom}>
-                                    <Link to={this.state.paintBoardLink}>Create a Room</Link>
+                                    <Link to={this.state.paintBoardLink} style={{ color: 'inherit', textDecoration: 'inherit'}}>Create a Room</Link>
                                 </button>
                             </div>
                         </div>
