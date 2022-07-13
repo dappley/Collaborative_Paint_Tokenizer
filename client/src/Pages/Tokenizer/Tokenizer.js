@@ -51,6 +51,7 @@ const Tokenizer = (props) => {
         token_address: result.events.printAddress.returnValues.value,
         token_ID: result.events.printTokenID.returnValues.value
       }
+      console.log(links);
       setResult(links);
     };
     createToken();
@@ -86,12 +87,6 @@ const Tokenizer = (props) => {
       <div className="Tokenizer">
         {!back? (
           <div className="Contents">
-            <button onClick={() => {
-              setBack(true);
-              tokenizer_toggle = !tokenizer_toggle;
-              }}>
-              <Link to={paintBoardLink} style={{ color: 'inherit', textDecoration: 'inherit'}}>Back</Link>
-            </button>
             <header>Digital Artwork Minter</header>
             <p>Convert your digital art work to a Non-fungible token!</p>
             <img src={base64ImageData} />
@@ -111,6 +106,12 @@ const Tokenizer = (props) => {
               <label>Token Description :</label>
               <input type='text' onChange={(event) => {setDescription(event.target.value); }} />
             </div>
+            <button onClick={() => {
+              setBack(true);
+              tokenizer_toggle = !tokenizer_toggle;
+            }}>
+              <Link to={paintBoardLink} style={{ color: 'inherit', textDecoration: 'inherit'}}>Back</Link>
+            </button>
             <button onClick={tokenize}>Tokenize</button>
             <ReturnTokenInfo />
           </div>

@@ -5,9 +5,11 @@
 }
 
 .Container header {
-  margin: 10px;
   font-size: 35px;
-  color: #f9d5e5;
+  font-weight: 500;
+  margin-bottom: 20px;
+  
+  color: #fff1f8;
 }
 
 #size {
