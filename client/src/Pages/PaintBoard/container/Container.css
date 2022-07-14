@@ -12,12 +12,17 @@
   color: #fff1f8;
 }
 
+#painting_tools {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
 #size {
-  margin: 10px auto 30px;
-  outline: none;
-  -webkit-appearance: none;
   width: 40vw;
   height: 10px;
+  -webkit-appearance: none;
   background-color: #f9d5e5;
 }
 
@@ -32,6 +37,10 @@
   border: 5px double #f9d5e5;
 }
 
+#size::-webkit-slider-thumb:hover {
+  background-color: #ae2e41;
+}
+
 #color::-webkit-color-swatch-wrapper {
   background-color: #c83349;
   border-radius: 20px;
@@ -44,11 +53,11 @@
 }
 
 #color {
+  margin-left: 5px;
   outline: none;
   background-color: #c83349;
   border: 3px solid #f9d5e5;
   border-radius: 20px;
-  margin: 5px;
   height: 35px;
   width: 50px;
 }
@@ -57,10 +66,15 @@
   outline: none;
   background-color: #c83349;
   color: #f9d5e5;
+  margin-left: 5px;
   font-family: 'Gloria Hallelujah', cursive;
   border: 3px solid #f9d5e5;
   border-radius: 20px;
   font-size: 15px;
+}
+
+#eraser:hover {
+  background-color: #ae2e41;
 }
 
 .canvas {
@@ -70,7 +84,7 @@
 
 .createImage {
   place-items: center;
-  margin-top: 30px;
+  margin-top: 50px;
 }
 
 canvas {
@@ -86,6 +100,10 @@ canvas {
   border: 3px solid #f9d5e5;
   border-radius: 20px;
   font-size: 15px;
+}
+
+.Container button:hover {
+  background-color: #ae2e41;
 }
 
 .PaintBoard {

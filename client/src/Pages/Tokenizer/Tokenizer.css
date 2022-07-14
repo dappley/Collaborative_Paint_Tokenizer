@@ -30,12 +30,92 @@
   font-family: 'Gloria Hallelujah', cursive;
 }
 
-.Tokenizer img {
-  background-color: white;
+
+#ArtWork {
+  height: 370px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
-#renderResult {
+  #ArtWork_Frame {
+    width: 370px;
+    height: 370px;
+    position: absolute;
+  }
+
+  #ArtWork_Frame img {
+    width: 370px;
+    height: 370px;
+  }
+
+  #ArtWork_Painting {
+    width: 300px;
+    height: 300px;
+  }
+
+  #ArtWork_Painting img {
+    position: relative;
+    background-color: white;
+  }
+
+#Tokenizer_Inputs {
+  margin-bottom: 20px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#Tokenizer_Inputs_Cell {
+  width: 180px;
+  height: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: right;
+
+  /* border: 1px solid black; */
+  text-align: right;
+}
+
+#Tokenizer_Buttons {
+  margin-bottom: 10px;
+}
+
+#Tokenizer_Buttons button {
+  margin-right: 5px;
+  margin-left: 5px;
+}
+
+#Tokenizer_RenderResult {
   margin-top: 20px;
-  width: 600px;
+
   place-items: center;
+}
+
+#Tokenizer_EmptyMessage {
+  height: 70px;
+}
+
+#LoadingScreen {
+  width: 100vw;
+  height: 100vh;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 999;
+}
+
+#LoadingScreen label {
+  padding: 30px;
+  border: 3px solid black;
+  background-color: white;
 }
