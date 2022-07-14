@@ -1,85 +1,77 @@
-#connectMetaMask {
-  float: right;
-  width: 100%;
-}
-
-#connectMetaMask button {
-  float: right;
-  margin: 5px;
-  width: 180px;
-  height: 40px;
-  outline: none;
-  font-size: 15px;
-  color: #ffffff;
-  border-radius: 10px;
-  background-color: RoyalBlue;
-  border: 3px solid #ffffff;
-  font-family: 'Gloria Hallelujah', cursive;
-}
-
 body {
   background: #e06377;
 }
 
-.lobby {
-  margin: 20%;
+#Lobby_ConnectMetaMask {
+  width: 100vw;
+  height: 70px;
+
+  display: flex;
+  align-items: center;
+  justify-content: right;
+}
+
+#Lobby_ConnectMetaMask button {
+  width: 180px;
+  height: 40px;
+  font-size: 15px;
+  margin-right: 20px;
+
+  border-radius: 10px;
+  border: 3px solid #ffffff;
+  font-family: 'Gloria Hallelujah', cursive;
+
+  color: #ffffff;
+  background-color: RoyalBlue;
+}
+
+#Lobby_ConnectMetaMask button:hover {
+  background-color: rgb(52, 85, 185);
+}
+
+#Lobby_Body {
+  font-family: 'Gloria Hallelujah', cursive;
+  place-items: center;
+  text-align: center;
   display: grid;
 }
 
-.lobby body {
-  width: 100vw;
-  height: 100vh;
-  color: #f9d5e5;
-}
-
-.main button {
-  margin: 5px;
-  padding: 8px;
-  width: 225px;
-  height: 50px;
-  outline: none;
-  font-size: 20px;
-  color: #f9d5e5;
-  border-radius: 20px;
-  background-color: #c83349;
-  border: 3px solid #f9d5e5;
-  font-family: 'Gloria Hallelujah', cursive;
-}
-
-.lobby button {
-  margin: 5px;
-  padding: 8px;
-  width: 225px;
-  height: 50px;
-  outline: none;
-  font-size: 20px;
-  color: #f9d5e5;
-  border-radius: 20px;
-  background-color: #c83349;
-  border: 3px solid #f9d5e5;
-  font-family: 'Gloria Hallelujah', cursive;
-}
-
-.lobby header {
-  margin: 10px;
+#Lobby_Body header {
   font-size: 35px;
-  color: #f9d5e5;
+  margin-bottom: 20px;
+
+  color: #fff1f8;
 }
 
-.lobby input {
+#Lobby_Body input {
   width: 210px;
   height: 40px;
-  margin: 5px;
-  border: 3px solid #f9d5e5;
   border-radius: 20px;
+  border: 3px solid #f9d5e5;
+
+  margin-top: 5px;
+  margin-bottom: 5px;
+
   padding: 5px;
   font-size: 16px;
   font-family: 'Gloria Hallelujah', cursive;
 }
 
-.lobby {
+#Lobby_Body button {
+  width: 225px;
+  height: 50px;
+  font-size: 20px;
+  border-radius: 20px;
+  border: 3px solid #f9d5e5;
+
+  margin-top: 5px;
+  margin-bottom: 5px;
+
+  color: #f9d5e5;
+  background-color: #c83349;
   font-family: 'Gloria Hallelujah', cursive;
-  place-items: center;
-  text-align: center;
-  display: grid;
+}
+
+#Lobby_Body button:hover {
+  background-color: #ae2e41;
 }

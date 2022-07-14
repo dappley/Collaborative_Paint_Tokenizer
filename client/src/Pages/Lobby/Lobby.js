@@ -16,7 +16,7 @@ const CONNECTION_PORT = 'http://localhost:5000';
 let export_accounts;
 let export_contract;
 
-class New_Lobby extends React.Component {
+class Lobby extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -151,36 +151,34 @@ class New_Lobby extends React.Component {
 
     render() {
         return (
-            <div>
-                <div id='connectMetaMask'>
+            <div className="Lobby">
+                <div id='Lobby_ConnectMetaMask'>
                     <button onClick={this.connectMetaMask}>Connect MetaMask</button>
                 </div>
                 <Router>
                     {!this.state.showPaint ? (
-                        <div className="App">
-                            <div className="lobby">
-                                <header>Welcome to collaborative paint and tokenizer!</header>
-                                <input
-                                    type="text"
-                                    placeholder="Artwork Title"
-                                    onChange={(event) => {
-                                    this.setArtworkTitle(event.target.value);
-                                    }}
-                                />
-                                <input
-                                    type="text"
-                                    placeholder="Room ID"
-                                    onChange={(event) => {
-                                    this.setRoom(event.target.value);
-                                    }}
-                                />
-                                <button onClick={this.joinRoom}>
-                                    <Link to={this.state.paintBoardLink} style={{ color: 'inherit', textDecoration: 'inherit'}}>Join a Room</Link>
-                                </button>
-                                <button onClick={this.startRoom}>
-                                    <Link to={this.state.paintBoardLink} style={{ color: 'inherit', textDecoration: 'inherit'}}>Create a Room</Link>
-                                </button>
-                            </div>
+                        <div id="Lobby_Body">
+                            <header>Welcome to collaborative paint and tokenizer!</header>
+                            <input
+                                type="text"
+                                placeholder="Artwork Title"
+                                onChange={(event) => {
+                                this.setArtworkTitle(event.target.value);
+                                }}
+                            />
+                            <input
+                                type="text"
+                                placeholder="Room ID"
+                                onChange={(event) => {
+                                this.setRoom(event.target.value);
+                                }}
+                            />
+                            <button onClick={this.joinRoom}>
+                                <Link to={this.state.paintBoardLink} style={{ color: 'inherit', textDecoration: 'inherit'}}>Join a Room</Link>
+                            </button>
+                            <button onClick={this.startRoom}>
+                                <Link to={this.state.paintBoardLink} style={{ color: 'inherit', textDecoration: 'inherit'}}>Create a Room</Link>
+                            </button>
                         </div>
                     ) : (
                         <Switch>
@@ -196,4 +194,4 @@ class New_Lobby extends React.Component {
 }
 
 export {export_accounts, export_contract};
-export default New_Lobby;
+export default Lobby;

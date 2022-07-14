@@ -32,7 +32,7 @@ function Container({ room, artworkTitle }) {
                         <header>Let's Paint {artworkTitle}!</header>
                         <p>Room ID: {room}</p>
                         <p>Brush size: {size}</p>
-                        <div className="painting_tools">
+                        <div id="painting_tools">
                             <input
                                 min={1}
                                 max={30}

@@ -7,6 +7,8 @@ import { NFTStorage, File } from 'nft.storage';
 import React, { useState } from "react";
 import "./Tokenizer.css";
 
+import Frame from '../Img/Frame.png';
+
 var tokenizer_toggle;
 
 const Tokenizer = (props) => {
@@ -20,6 +22,7 @@ const Tokenizer = (props) => {
   const [result, setResult] = useState(undefined);
   const [back, setBack] = useState(false);
   const [paintBoardLink] = useState("/PaintBoard/room=" + roomId);
+  const [loading, setLoading] = useState(false);
 
   //Converts the base64 image data to an image file
   function dataURLtoFile(dataurl, filename) {
@@ -37,6 +40,7 @@ const Tokenizer = (props) => {
   // Create IPFS & Metadata then pin the data on the nft.storage
   function tokenize() {
     const createToken = async () => {
+      setLoading(true);
       require('dotenv').config()
       const client = new NFTStorage({ token: process.env.REACT_APP_SECRET_APIKEY })
       const metadata = await client.store({
@@ -52,6 +56,7 @@ const Tokenizer = (props) => {
         token_ID: result.events.printTokenID.returnValues.value
       }
       setResult(links);
+      setLoading(false);
     };
     createToken();
   }
@@ -61,20 +66,40 @@ const Tokenizer = (props) => {
   function ReturnTokenInfo() {
     if (result != null) {
       return (
-        <div id='renderResult'>
-          <label>Artowkr Link:</label>
-          <input type='text' value={result.artwork_link} />
-          <label>Metadata Link:</label>
-          <input type='text' value={result.metadata_link} />
-          <label>Token address:</label>
-          <input type='text' value={result.token_address} />
-          <label>Token ID:</label>
-          <input type='text' value={result.token_ID} />
-        </div>
+        <div id="Tokenizer_Inputs">
+          <div>
+            <div id="Tokenizer_Inputs_Cell">
+              <label>Artowkr Link:</label>
+            </div>
+            <div id="Tokenizer_Inputs_Cell">
+              <label>Metadata Link:</label>
+            </div>
+            <div id="Tokenizer_Inputs_Cell">
+              <label>Token address:</label>
+            </div>
+            <div id="Tokenizer_Inputs_Cell">
+              <label>Token ID:</label>
+            </div>
+          </div>
+          <div>
+            <div id="Tokenizer_Inputs_Cell">
+              <input readyonly type='text' value={result.artwork_link} />
+            </div>
+            <div id="Tokenizer_Inputs_Cell">
+              <input readyonly type='text' value={result.metadata_link} />
+            </div>
+            <div id="Tokenizer_Inputs_Cell">
+              <input readyonly type='text' value={result.token_address} />
+            </div>
+            <div id="Tokenizer_Inputs_Cell">
+              <input readyonly type='text' value={result.token_ID} />
+            </div>
+          </div>
+      </div>
       )
     } else {
       return (
-        <div>
+        <div id="Tokenizer_EmptyMessage">
           <label>No Transaction Record</label>
         </div>
       )
@@ -83,35 +108,63 @@ const Tokenizer = (props) => {
 
   return (
     <Router>
+      {loading && (
+        <div id="LoadingScreen">
+          <label>Tokenizing Your Artwork, Please Wait...</label>
+        </div>
+      )}
       <div className="Tokenizer">
         {!back? (
           <div className="Contents">
-            <button onClick={() => {
-              setBack(true);
-              tokenizer_toggle = !tokenizer_toggle;
-              }}>
-              <Link to={paintBoardLink} style={{ color: 'inherit', textDecoration: 'inherit'}}>Back</Link>
-            </button>
             <header>Digital Artwork Minter</header>
             <p>Convert your digital art work to a Non-fungible token!</p>
-            <img src={base64ImageData} />
-            <div>
-              <label>Recipient :</label>
-              <input type='text' onChange={(event) => {setRecipient(event.target.value); }} />
+            <div id="ArtWork">
+              <div id="ArtWork_Frame">
+                <img src={Frame} />
+              </div>
+              <div id="ArtWork_Painting">
+                <img src={base64ImageData} />
+              </div>
             </div>
-            <div>
-              <label>Token Symbol :</label>
-              <input type='text' onChange={(event) => {setSymbol(event.target.value); }} />
+            <div id="Tokenizer_Inputs">
+              <div>
+                <div id="Tokenizer_Inputs_Cell">
+                  <label>Recipient :</label>
+                </div>
+                <div id="Tokenizer_Inputs_Cell">
+                  <label>Token Symbol :</label>
+                </div>
+                <div id="Tokenizer_Inputs_Cell">
+                  <label>Token Name :</label>
+                </div>
+                <div id="Tokenizer_Inputs_Cell">
+                  <label>Token Description :</label>
+                </div>
+              </div>
+              <div>
+                <div id="Tokenizer_Inputs_Cell">
+                  <input type='text' onChange={(event) => {setRecipient(event.target.value); }} />
+                </div>
+                <div id="Tokenizer_Inputs_Cell">
+                  <input type='text' onChange={(event) => {setSymbol(event.target.value); }} />
+                </div>
+                <div id="Tokenizer_Inputs_Cell">
+                  <input type='text' onChange={(event) => {setName(event.target.value); }} />
+                </div>
+                <div id="Tokenizer_Inputs_Cell">
+                  <input type='text' onChange={(event) => {setDescription(event.target.value); }} />
+                </div>
+              </div>
             </div>
-            <div>
-              <label>Token Name :</label>
-              <input type='text' onChange={(event) => {setName(event.target.value); }} />
+            <div id="Tokenizer_Buttons">
+              <button onClick={() => {
+                setBack(true);
+                tokenizer_toggle = !tokenizer_toggle;
+              }}>
+                <Link to={paintBoardLink} style={{ color: 'inherit', textDecoration: 'inherit'}}>Back</Link>
+              </button>
+              <button onClick={tokenize}>Tokenize</button>
             </div>
-            <div>
-              <label>Token Description :</label>
-              <input type='text' onChange={(event) => {setDescription(event.target.value); }} />
-            </div>
-            <button onClick={tokenize}>Tokenize</button>
             <ReturnTokenInfo />
           </div>
         ) : (
