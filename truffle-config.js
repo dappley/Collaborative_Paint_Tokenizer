@@ -4,7 +4,7 @@ const path = require("path");
 // const infuraKey = "45235b9ed68b456f81374e2e74bdf94a";
 
 // const fs = require('fs');
-// const mnemonic = "often easily cram buffalo apple creek kiwi list aim pretty fade couple"; //fs.readFileSync(".secret").toString().trim();
+// const mnemonic = fs.readFileSync(".secret").toString().trim();
 
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
